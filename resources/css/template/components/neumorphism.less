@@ -1,0 +1,32 @@
+
+.neumorphism-foregen(@radius:5px){
+    .border-radus(@radius);
+    background: #091638;
+    box-shadow:  -5px -5px 10px #060f26,
+    5px 5px 10px #0c1d4a;
+}
+.neumorphism-none(@radius:5px,@color:@theme){
+    .border-radus(@radius);
+    background: @color;
+    border: .5px solid @border-color;
+    box-shadow: none;
+}
+.neumorphism-highlight(@radius:5px){
+    .border-radus(@radius);
+    background: linear-gradient(145deg, #f6f7ff, #cfd0d6);
+    box-shadow:  3px 3px 6px #c4c4ca,
+        -3px -3px 6px #ffffff;
+}
+.neumorphism-involved(@radius:5px){
+    .border-radus(@radius);
+    box-shadow: -5px -5px 5px rgba(255, 255, 255, 0.1),
+    10px 10px 10px rgba(0, 0, 0, 0.4),
+        inset -5px -5px 5px rgba(255, 255, 255, 0.2),
+    inset 10px 10px 10px rgba(0, 0, 0, 0.4);
+}
+.neumorphism-internal(@radius:5px){
+    .border-radus(@radius);
+    background: #000000;
+    box-shadow: inset -5px -5px 10px #303030,
+    inset 5px 5px 10px #303030;
+}

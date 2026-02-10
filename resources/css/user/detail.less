@@ -1,0 +1,152 @@
+@import "../template/colors";
+p{
+    margin: 0;
+    margin-top: 10px;
+}
+#ads-code span {
+    background: @c1;
+    color: white;
+    border-radius: 4px;
+    padding: 0 6px;
+}
+
+h1 {
+    font-size: 23px;
+    margin-top: 10px;
+}
+
+.swiper {
+    width: 100%;
+    height: 330px;
+    border-radius: 6px;
+}
+
+.swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ececec;
+}
+
+.swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#detail {
+    i {
+        font-size: 18px;
+        margin-left: 10px;
+        display: inline-block;
+        width: 20px;
+
+        &.star {
+            width: auto;
+            font-size: 38px;
+            color: #FF5722;
+            transform: scalex(-1);
+        }
+    }
+}
+
+.options {
+    flex-wrap: wrap;
+    justify-content: right;
+
+    li {
+        text-align: right;
+        padding: 10px;
+        margin: 0;
+        display: flex;
+        flex-wrap: nowrap;
+        flex-flow: row;
+        justify-content: right;
+        width: 50%;
+
+        p {
+            font-size: 14px;
+            margin: 0;
+
+        }
+
+        i.ic {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            margin-left: 10px;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+    }
+}
+
+
+#map {
+    height: 200px;
+    width: 100%;
+    margin-top: 60px;
+}
+.stars-container >#star-content{
+    display: flex;
+    flex-flow: row;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: right;
+    width: 100%;
+    >div:nth-child(1){
+        margin-left: 20px;
+    }
+}
+.stars-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+}
+
+.stars-container input[type="radio"] {
+    display: none;
+}
+
+.stars-container label {
+    font-size: 40px;
+    color: #ccc;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.3s ease;
+    text-shadow: 1px 1px 2px #00000055;
+}
+
+.stars-container label.active:hover,
+.stars-container label.active:hover ~ label {
+    color: #FF5722;
+    transform: scale(1.2);
+}
+
+.stars-container input[type="radio"]:checked ~ label {
+    color: #FF5722;
+}
+
+.star-description {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #555;
+    min-width: 100%;
+    text-align: center;
+    display: none;
+    position: absolute;
+    top: 55px;
+}
+

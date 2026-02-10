@@ -1,0 +1,250 @@
+footer{
+    .hr{
+        width: 95%;
+        margin: 0 auto;
+        height: 3px;
+        background: black;
+    }
+    p{
+        text-align: center;
+    }
+    #licences-imgs{
+        img{
+            margin: 6px;
+        }
+    }
+}
+.social-icons {
+    justify-content: center;
+}
+.social-icons a:hover{
+    color: white!important;
+    text-decoration: none!important;
+}
+.footer {
+    background-color: @primary;
+    color: white;
+    padding: 50px 20px 20px;
+}
+
+.footer-content {
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: space-between;
+}
+
+.footer-col {
+    flex: 1 1 220px;
+    min-width: 200px;
+    margin-bottom: 20px;
+}
+
+.brand-col {
+    flex: 1.5 1 300px;
+}
+
+.footer-col h3,
+.footer-col h4 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 8px;
+    position: relative;
+}
+
+.footer-col h3::after,
+.footer-col h4::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: 0;
+    width: 50px;
+    height: 2px;
+    background-color: white;
+}
+
+.footer-col p {
+    font-size: 0.9rem;
+    line-height: 1.8;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.footer-links-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: block;
+}
+
+.footer-links-list li {
+    margin-bottom: 12px;
+    transition: transform 0.2s;
+    display: block;
+}
+
+.footer-links-list li:hover {
+    transform: translateX(-5px);
+}
+
+.footer-links-list li a {
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-links-list li a::before {
+    content: '›';
+    color: white;
+    font-size: 1.2rem;
+}
+
+.footer-links-list li a:hover {
+    color: white;
+}
+
+.social-icons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+
+
+.trust-badges {
+    display: flex;
+    gap: 15px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.trust-badges img {
+    width: 70px;
+    background: #fff;
+    padding: 5px;
+    border-radius: 6px;
+    transition: transform 0.3s;
+}
+
+.trust-badges img:hover {
+    transform: scale(1.05);
+}
+
+.contact-info {
+    margin-top: 15px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.contact-item i {
+    color: white;
+    width: 20px;
+    text-align: center;
+}
+
+.contact-info .phone {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: white;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+}
+
+.footer-links {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.copyright {
+    opacity: 0.8;
+}
+
+@media (max-width: 992px) {
+    .footer-content {
+        gap: 30px;
+    }
+
+    .footer-col {
+        flex: 1 1 180px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: right;
+        gap: 30px;
+    }
+
+    .footer-col {
+        width: 100%;
+        flex: 1 1 auto;
+    }
+
+    .trust-badges {
+        justify-content: flex-start;
+    }
+
+    .footer-links {
+        justify-content: center;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer {
+        padding: 30px 15px 15px;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

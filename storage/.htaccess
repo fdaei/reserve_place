@@ -1,0 +1,26 @@
+# جلوگیری کامل از دسترسی از طریق وب
+Deny from all
+
+# حتی اگر Deny کار نکرد از Require استفاده کن
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+
+# غیرفعال کردن PHP در این پوشه
+php_flag engine off
+
+# تبدیل فایل‌های PHP به متن ساده برای خواندن نشدن
+AddType text/plain .php .php3 .php4 .php5 .php7 .php8 .phtml .phar
+
+# مسدود کردن تمام انواع فایل‌های اجرایی
+<FilesMatch "\.(php|php[0-9]|phtml|phar|inc|pl|py|jsp|asp|sh|cgi|exe|dll|bat|cmd|com|jar)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# جلوگیری از لیست شدن
+Options -Indexes
+
+# پیام خطای سفارشی
+ErrorDocument 403 "Access Forbidden"
+ErrorDocument 404 "File Not Found"

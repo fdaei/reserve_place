@@ -1,0 +1,340 @@
+
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --hover-color: #2980b9;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Vazir', Tahoma;
+}
+
+body {
+    background: #f5f7fb;
+    margin: 0;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* سایدبار */
+.sidebar {
+    background: var(--primary-color);
+    width: 280px;
+    padding: 20px;
+    position: fixed;
+    height: 100%;
+    transition: 0.3s;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+    a{
+        color: white;
+        text-decoration: none;
+    }
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo img {
+    width: 120px;
+}
+
+.menu-item {
+    color: #fff;
+    padding: 15px;
+    margin: 8px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+}
+
+.menu-item:hover {
+    background: var(--hover-color);
+    transform: translateX(5px);
+}
+.menu-item.active {
+    background: var(--hover-color);
+    transform: translateX(5px);
+}
+
+.menu-item i {
+    width: 30px;
+    font-size: 18px;
+}
+
+/* محتوای اصلی */
+.main-content {
+    flex: 1;
+    margin-right: 280px;
+    padding: 30px;
+}
+
+/* هدر */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.stats-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-box {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* جداول */
+.data-table {
+    width: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.data-table th,
+.data-table td {
+    padding: 15px;
+    text-align: right;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background: var(--secondary-color);
+    color: white;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+}
+
+/* فرمها */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        right: -100%;
+        z-index: 1000;
+    }
+
+    .sidebar.active {
+        right: 0;
+    }
+
+    .main-content {
+        margin-right: 0;
+        padding: 20px;
+    }
+}
+
+/* استایل‌های جدید */
+.settings-form {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    max-width: 800px;
+}
+
+.file-upload {
+    border: 2px dashed #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.file-upload .preview-box {
+    margin-top: 15px;
+    max-width: 200px;
+}
+
+.file-upload .preview-box img {
+    max-width: 100%;
+    border-radius: 6px;
+}
+
+.checkboxes label {
+    display: block;
+    margin: 10px 0;
+    cursor: pointer;
+}
+
+.checkboxes input[type="checkbox"] {
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+small {
+    color: #666;
+    font-size: 0.9em;
+    display: block;
+    margin-top: 5px;
+}
+
+/* استایل‌های جدید */
+.stat-box {
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-box:before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+}
+
+.stat-value {
+    font-size: 2.2em;
+    margin: 15px 0;
+    color: var(--primary-color);
+}
+
+/* استایل سوییچ ویژه */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 45px;
+    height: 25px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background: var(--secondary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* بهبود responsive */
+@media (max-width: 768px) {
+    .stats-boxes {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-value {
+        font-size: 1.8em;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    gap: 8px;
+}
+
+.pagination a, .pagination span {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+
+.pagination a {
+    background: #fff;
+    color: #374151;
+}
+
+.pagination a:hover {
+    background: #f3f4f6;
+}
+
+.pagination .active {
+    background: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+
+.pagination .disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}

@@ -1,0 +1,33 @@
+@import "../template/colors";
+.tickets{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    width: 100%;
+    li{
+        width: 100%;
+        margin-top: 12px;
+        >div{
+            border-radius: 6px;
+            padding: 8px 16px 4px 16px;
+            display: inline-block;
+            width: 80%;
+            .op-5{
+                font-size: 14px;
+            }
+        }
+    }
+    .me{
+        text-align: right;
+        >div {
+            color: white;
+            background: @primary !important;
+        }
+    }
+    .user{
+        text-align: left;
+        >div {
+            background: #ccc !important;
+        }
+    }
+}

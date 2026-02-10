@@ -1,0 +1,61 @@
+@import "../template/colors";
+
+.col-6,.col-12{
+    margin-top: 14px;
+}
+#image-container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: right;
+    .user-ic, img {
+        font-size: 80px;
+        display: inline-block;
+        width: 120px;
+        height: 120px;
+        background: @c3;
+        text-align: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        padding-top: 28px;
+        border-radius: 6px;
+        margin-right: 10px;
+    }
+    >div{
+        span{
+            font-size: 12px;opacity: .7;padding-right: 8px
+        }
+        input{
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: white;
+            margin-top: 8px;
+        }
+    }
+}
+input[type=text]{
+    padding: 6px;
+}
+
+
+@media screen and (max-width: 600px) {
+    #image-container {
+
+        > div {
+            span {
+            }
+
+            input {
+                padding: 6px;
+                margin-right: 10px;
+                width: 170px;
+                border-radius: 4px;
+                font-size: 10px;
+                color: white;
+                margin-top: 15px;
+            }
+        }
+    }
+}

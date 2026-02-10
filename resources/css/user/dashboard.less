@@ -1,0 +1,69 @@
+@import "../template/colors";
+#btns {
+
+    .btn {
+        padding: 8px;
+        display: inline-block;
+        width: 155px;
+        margin: 6px;
+        margin-top: 10px;
+        span.icon {
+            display: inline-block;
+            background: @primary!important;
+            width: 48px;
+            margin-top: 10px;
+            height: 48px;
+            padding-top: 12px;
+            border-radius: 20px;
+
+            .fa {
+                font-size: 24px;
+                color: white;
+                margin: 0 auto;
+                display: inline-block;
+            }
+        }
+        h4{
+            margin-top: 18px;
+            font-size: 16px!important;
+        }
+        p{
+            margin-top: 10px;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #f0f4f8;
+            color: #4a6491;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    }
+}
+.logout{
+    padding: 6px 28px;
+    border: 1px solid @danger;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    color: @danger;
+    margin-top: -8px;
+    &:hover{
+        color: white!important;
+        background: @danger;
+    }
+}
+
+#residences {
+    .hr {
+        padding-top: 4px;
+
+        .btn {
+            font-size: 12px !important;
+            padding: 2px 4px !important;
+        }
+    }
+}
