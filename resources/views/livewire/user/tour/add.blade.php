@@ -229,9 +229,9 @@
                     <label for="file-upload"
                            class="{{sizeof($gallery)>=3?"op-5":""}} custom-upload-btn">آپلود
                         فایل</label>
-                    <input {{sizeof($gallery)>=3?"disabled":""}} wire:loading.attr="image"
+                    <input {{sizeof($gallery)>=3?"disabled":""}} wire:loading.attr="disabled"
                            wire:target="image" wire:model.live="image"
-                           type="file" id="file-upload" accept="image/jpeg" class="file-input"/>
+                           type="file" id="file-upload" accept="image/jpeg,image/png,image/webp,image/gif" class="file-input"/>
 
                     <div style="width: 100%" x-show="uploading">
                         <progress style="width: 100%" max="100" x-bind:value="progress"></progress>

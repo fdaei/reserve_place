@@ -56,7 +56,7 @@ class WebsiteManager extends Component
     {
         if ($this->iconInput) {
             $extenstion = $this->iconInput->getClientOriginalExtension();
-            $this->iconInput->storeAs("public/" , $this->icon);
+            $this->iconInput->storeAs("", $this->icon, 'public');
             $this->iconInput=null;
             Config::where("title","website-icon")->update([
                 "value" =>$this->icon
@@ -64,35 +64,35 @@ class WebsiteManager extends Component
         }
         if ($this->bannerSeasonImageTemp) {
             $extenstion = $this->bannerSeasonImageTemp->getClientOriginalExtension();
-            $this->bannerSeasonImageTemp->storeAs("public/" , $this->bannerSeasonImage);
+            $this->bannerSeasonImageTemp->storeAs("", $this->bannerSeasonImage, 'public');
             $this->bannerSeasonImageTemp=null;
             Config::where("title","bannerSeasonImage")->update([
                 "value" =>$this->bannerSeasonImage
             ]);
         }
         if ($this->markerMapIconTemp) {
-            $this->markerMapIconTemp->storeAs("public/" , $this->markerMapIcon);
+            $this->markerMapIconTemp->storeAs("", $this->markerMapIcon, 'public');
             $this->markerMapIconTemp=null;
             Config::where("title","markerMapIcon")->update([
                 "value" =>$this->markerMapIcon
             ]);
         }
         if ($this->markerMapFoodstoreIconTemp) {
-            $this->markerMapFoodstoreIconTemp->storeAs("public/" , $this->markerMapFoodstoreIcon);
+            $this->markerMapFoodstoreIconTemp->storeAs("", $this->markerMapFoodstoreIcon, 'public');
             $this->markerMapFoodstoreIconTemp=null;
             Config::where("title","markerMapFoodstoreIcon")->update([
                 "value" =>$this->markerMapFoodstoreIcon
             ]);
         }
         if ($this->offlineModeIconTemp) {
-            $this->offlineModeIconTemp->storeAs("public/" , $this->offlineModeIcon);
+            $this->offlineModeIconTemp->storeAs("", $this->offlineModeIcon, 'public');
             $this->offlineModeIconTemp=null;
             Config::where("title","offlineModeIcon")->update([
                 "value" =>$this->offlineModeIcon
             ]);
         }
         if ($this->page404IconTemp) {
-            $this->page404IconTemp->storeAs("public/" , $this->page404Icon);
+            $this->page404IconTemp->storeAs("", $this->page404Icon, 'public');
             $this->page404IconTemp=null;
             Config::where("title","page404Icon")->update([
                 "value" =>$this->page404Icon

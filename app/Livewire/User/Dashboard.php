@@ -34,8 +34,8 @@ class Dashboard extends Component{
     function removeResidence($id){
         $residence=Residence::find($id);
         foreach ($residence->images as $item) {
-            if (Storage::disk('local')->exists('/public/residences/' . $item->url)) {
-                Storage::disk('local')->delete('/public/residences/' . $item->url);
+            if (Storage::disk('public')->exists('residences/' . $item->url)) {
+                Storage::disk('public')->delete('residences/' . $item->url);
             }
         }
         Images::where("residence_id", $id)->delete();
@@ -46,8 +46,8 @@ class Dashboard extends Component{
     function removeFriend($id){
         $model=Friend::find($id);
         foreach ($model->images as $item) {
-            if (Storage::disk('local')->exists('/public/friends/' . $item->url)) {
-                Storage::disk('local')->delete('/public/friends/' . $item->url);
+            if (Storage::disk('public')->exists('friends/' . $item->url)) {
+                Storage::disk('public')->delete('friends/' . $item->url);
             }
         }
         Images::where("friend_id", $id)->delete();
@@ -58,8 +58,8 @@ class Dashboard extends Component{
     function removeFoodstore($id){
         $model=FoodStore::find($id);
         foreach ($model->images as $item) {
-            if (Storage::disk('local')->exists('/public/food_store/' . $item->url)) {
-                Storage::disk('local')->delete('/public/food_store/' . $item->url);
+            if (Storage::disk('public')->exists('food_store/' . $item->url)) {
+                Storage::disk('public')->delete('food_store/' . $item->url);
             }
         }
         Images::where("store_id", $id)->delete();
@@ -70,8 +70,8 @@ class Dashboard extends Component{
     function removeTour($id){
         $model=Tour::find($id);
         foreach ($model->images as $item) {
-            if (Storage::disk('local')->exists('/public/tours/' . $item->url)) {
-                Storage::disk('local')->delete('/public/tours/' . $item->url);
+            if (Storage::disk('public')->exists('tours/' . $item->url)) {
+                Storage::disk('public')->delete('tours/' . $item->url);
             }
         }
         Images::where("tour_id", $id)->delete();

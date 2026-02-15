@@ -3,9 +3,7 @@
 namespace App\Livewire\User\Tour;
 
 use App\Models\City;
-use App\Models\OptionValue;
 use App\Models\Province;
-use App\Models\Residence;
 use App\Models\Images;
 use App\Models\Tour;
 use Illuminate\Support\Facades\Redirect;
@@ -49,7 +47,7 @@ class Add extends Component
     ];
     public $mainImage = "";
 
-    #[Validate('image|max:5120|mimes:jpg,jpeg')]
+    #[Validate('image|max:5120|mimes:jpg,jpeg,png,webp,gif')]
     public $image;
 
     public function updatedTourTimeFrame(){
@@ -61,19 +59,30 @@ class Add extends Component
         $this->openTourTime="1";
     }
 
+    public function updatedProvince($province)
+    {
+        $this->city = City::where('province_id', $province)->value('id');
+        $this->resetValidation('city');
+    }
+
     public function updatedImage()
     {
+        $this->validateOnly('image');
         if (sizeof($this->gallery)>3){
             $this->addError('image', 'تعداد تصاویر به حداکثر تعداد مجاز رسیده است.');
             return;
         }
-        $size=getimagesize($this->image->getRealPath());
+        $size=@getimagesize($this->image->getRealPath());
+        if ($size === false){
+            $this->addError('image', 'فایل انتخاب‌شده تصویر معتبر نیست.');
+            return;
+        }
         if ($size[0]<500 or $size[1]<500){
             $this->addError('image', 'حداقل عرض و ارتفاع تصویر باید 500پیکسل باشد.');
             return;
         }
         $imageName = "injaa_" . time() . "." . $this->image->extension();
-        $url = $this->image->storeAs('public/tours', $imageName);
+        $this->image->storeAs('tours', $imageName, 'public');
         if (sizeof($this->gallery) == 0) {
             $this->mainImage = $imageName;
         }
@@ -88,8 +97,8 @@ class Add extends Component
 
     public function delete($image)
     {
-        if (Storage::disk('local')->exists('public/tours/' . $image)) {
-            Storage::disk('local')->delete('public/tours/' . $image);
+        if (Storage::disk('public')->exists('tours/' . $image)) {
+            Storage::disk('public')->delete('tours/' . $image);
         }
         unset($this->gallery[$image]);
         $this->gallery=array_values($this->gallery);
@@ -190,15 +199,33 @@ class Add extends Component
             "expire_date"=>$this->tourTimeFrame=="one"?$this->openTourTime:null,
             "status" => true,
         ];
-        $residence=null;
+        $tour = null;
+        $oldImages = [];
         if ($this->id==null){
             $tour = Tour::create($data);
             session()->put('message', "تور با موفقیت ثبت شد");
         }else{
-            $tour=Tour::find($this->id);
+            $tour = Tour::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$tour) {
+                session()->put('message', "تور موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
+
+            $oldImages = $tour->images()->pluck('url')->toArray();
             $tour->update($data);
-            Images::where("residence_id", $this->id)->delete();
-            OptionValue::where("residence_id",$this->id)->delete();
+            Images::where("tour_id", $this->id)->delete();
+
+            $newImages = array_values($this->gallery);
+            foreach (array_diff($oldImages, $newImages) as $deletedImage) {
+                if (Storage::disk('public')->exists('tours/' . $deletedImage)) {
+                    Storage::disk('public')->delete('tours/' . $deletedImage);
+                }
+            }
+
             session()->put('message', "تور با موفقیت ویرایش شد");
         }
         foreach ($this->gallery as $item) {
@@ -218,7 +245,16 @@ class Add extends Component
         $this->id=$id;
         view()->share('title', "افزودن اقامتگاه");
         if ($this->id != null) {
-            $tour=Tour::find($this->id);
+            $tour = Tour::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$tour) {
+                session()->put('message', "تور موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
+
             $this->title=$tour->title;
             $this->province=$tour->province_id;
             $this->city=$tour->city_id;

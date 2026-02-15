@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -74,5 +75,14 @@ class FoodStore extends Model
     }
     function optionValues(){
         return $this->hasMany(OptionValue::class,"foodstore_id","id");
+    }
+
+    public function scopeSearch(Builder $query, $searchText){
+        return $query->where(function (Builder $builder) use ($searchText) {
+            $builder
+                ->where('title', 'like', '%' . $searchText . '%')
+                ->orWhere('address', 'like', '%' . $searchText . '%')
+                ->orWhere('id', $searchText);
+        });
     }
 }

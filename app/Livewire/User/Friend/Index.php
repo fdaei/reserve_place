@@ -2,7 +2,6 @@
 
 namespace App\Livewire\User\Friend;
 
-use App\Models\City;
 use App\Models\Country;
 use App\Models\Province;
 use Livewire\Attributes\Url;
@@ -19,7 +18,6 @@ class Index extends Component{
 
     #[Url(except: '')]
     public $searchText="";
-
 
     public function render()
     {
@@ -51,6 +49,11 @@ class Index extends Component{
     public function search(){
         $this->resetPage();
     }
+
+    public function filter(){
+        $this->resetPage();
+    }
+
     public function updatedC(){
         $this->resetPage();
     }

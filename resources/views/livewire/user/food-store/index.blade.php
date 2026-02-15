@@ -279,8 +279,8 @@
             <li>
                 <select  wire:model.live="a"  class="form-control form-control-sm" aria-label="مرتب سازی">
                     <option value="0">مرتب سازی</option>
-                    <option value="1">ارزان ترین</option>
-                    <option value="2">گران ترین</option>
+                    <option value="1">جدیدترین</option>
+                    <option value="2">قدیمی‌ترین</option>
                     <option value="3">پرطرفدارترین</option>
                 </select>
             </li>

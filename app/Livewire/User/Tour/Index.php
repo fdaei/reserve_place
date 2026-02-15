@@ -58,6 +58,11 @@ class Index extends Component
     public function search(){
         $this->resetPage();
     }
+
+    public function filter(){
+        $this->resetPage();
+    }
+
     public function updatedC(){
         $this->resetPage();
     }

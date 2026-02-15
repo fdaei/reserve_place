@@ -181,7 +181,7 @@
 <body id="body" class="rtl" itemscope itemtype="https://schema.org/WebPage">
     @if(explode("/",request()->path())[0]!="admin")
         <header>
-            <div style="background-image: url('{{asset("storage/".getConfigs("bannerSeasonImage"))}}');background-repeat:no-repeat;padding-bottom: 8px;">
+            <div style="background-image: url('{{asset("storage/".getConfigs("bannerSeasonImage"))}}');background-repeat:no-repeat;background-size:cover;background-position:center;background-color:#2c5d90;padding-bottom: 8px;">
                 <div class="container">
                     <div class="row">
                         @include("partials.header")

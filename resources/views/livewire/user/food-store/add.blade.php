@@ -96,7 +96,7 @@
             </div>
             <div class="col-12">
                 <br>
-                <link rel="stylesheet" href="{{asset("plugin/leaflet.css")}}"/>
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
 
                 <p style="font-size: 14px;opacity: .8">مختصات جغرافیایی</p>
 
@@ -106,64 +106,70 @@
 
                 <div wire:ignore id="map" style="height: 400px;"></div>
 
-                <script src="{{asset("/plugin/leaflet.js")}}"></script>
+                <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
                 <script>
-                    var letLng = [{{ $latLen!="" ? explode(":", $latLen)[0] : "36.907681" }}, {{ $latLen!="" ? explode(":", $latLen)[1] : "50.675039" }}];
+                    if (typeof L === 'undefined') {
+                        console.warn('Leaflet not loaded');
+                        document.getElementById('map').innerHTML =
+                            '<div class="text-danger" style="padding:12px">نقشه لود نشد. اتصال اینترنت یا فایل‌های Leaflet را بررسی کنید.</div>';
+                    } else {
+                        var letLng = [{{ $latLen!="" ? explode(":", $latLen)[0] : "36.907681" }}, {{ $latLen!="" ? explode(":", $latLen)[1] : "50.675039" }}];
 
-                    var map = L.map('map').setView(letLng, 12);
+                        var map = L.map('map').setView(letLng, 12);
 
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '&copy; OpenStreetMap contributors'
-                    }).addTo(map);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: '&copy; OpenStreetMap contributors'
+                        }).addTo(map);
 
-                    var userIcon = L.icon({
-                        iconUrl: '{{ asset("storage/".getConfigs("markerMapFoodstoreIcon")) }}',
-                        iconSize: [48, 48],
-                        iconAnchor: [24, 48],
-                    });
+                        var userIcon = L.icon({
+                            iconUrl: '{{ asset("storage/".getConfigs("markerMapFoodstoreIcon")) }}',
+                            iconSize: [48, 48],
+                            iconAnchor: [24, 48],
+                        });
 
-                    var marker = L.marker(letLng, {icon: userIcon}).addTo(map);
+                        var marker = L.marker(letLng, {icon: userIcon}).addTo(map);
 
-                    var fixedLocations = [
-                        @foreach(\App\Models\Residence::all() as $item)
-                        { lat: {{$item->lat}}, lng: {{$item->lng}}, name: "{{$item->title}}" },
-                        @endforeach
-                    ];
+                        var fixedLocations = [
+                            @foreach(\App\Models\Residence::all() as $item)
+                            { lat: {{$item->lat}}, lng: {{$item->lng}}, name: "{{$item->title}}" },
+                            @endforeach
+                        ];
 
-                    var customFixedIcon = L.icon(
-                        {
-                        iconUrl: '{{ asset("storage/".getConfigs("markerMapIcon")) }}',
-                        iconSize: [20, 20],
-                        iconAnchor: [20, 40],
-                        }
-                   );
+                        var customFixedIcon = L.icon(
+                            {
+                            iconUrl: '{{ asset("storage/".getConfigs("markerMapIcon")) }}',
+                            iconSize: [20, 20],
+                            iconAnchor: [20, 40],
+                            }
+                       );
 
-                    fixedLocations.forEach(function(location){
-                        L.marker([location.lat, location.lng], {icon: customFixedIcon})
-                            .addTo(map)
-                            .bindPopup(location.name);
-                    });
+                        fixedLocations.forEach(function(location){
+                            L.marker([location.lat, location.lng], {icon: customFixedIcon})
+                                .addTo(map)
+                                .bindPopup(location.name);
+                        });
 
-                    map.on('click', function (e) {
-                        var lat = e.latlng.lat.toFixed(6);
-                        var lng = e.latlng.lng.toFixed(6);
+                        map.on('click', function (e) {
+                            var lat = e.latlng.lat.toFixed(6);
+                            var lng = e.latlng.lng.toFixed(6);
 
-                        if (marker) {
-                            map.removeLayer(marker);
-                        }
+                            if (marker) {
+                                map.removeLayer(marker);
+                            }
 
-                        marker = L.marker([lat, lng], {icon: userIcon}).addTo(map);
+                            marker = L.marker([lat, lng], {icon: userIcon}).addTo(map);
 
-                    @this.set('latLen', lat + ":" + lng);
-                    });
+                        @this.set('latLen', lat + ":" + lng);
+                        });
+                    }
                 </script>
             </div>
             <div class="col-12">
                 <br>
                 <br>
                 <p class="m-0" style="font-size: 14px;opacity: .8">
-                    آپلود تصاویر (حداکثر 8 عکس)
+                    آپلود تصاویر (حداکثر 3 عکس)
                     <i class="fa fa-spin fa-spinner" wire:loading wire:target="image"></i>
                 </p>
                 <div
@@ -177,9 +183,9 @@
                     <label for="file-upload"
                            class="{{sizeof($gallery)>=3?"op-5":""}} custom-upload-btn">آپلود
                         فایل</label>
-                    <input {{sizeof($gallery)>=3?"disabled":""}} wire:loading.attr="image"
+                    <input {{sizeof($gallery)>=3?"disabled":""}} wire:loading.attr="disabled"
                            wire:target="image" wire:model.live="image"
-                           type="file" id="file-upload" accept="image/jpeg" class="file-input"/>
+                           type="file" id="file-upload" accept="image/jpeg,image/png,image/webp,image/gif" class="file-input"/>
 
                     <div style="width: 100%" x-show="uploading">
                         <progress style="width: 100%" max="100" x-bind:value="progress"></progress>
@@ -196,7 +202,7 @@
                             <img wire:click="changeMainImage('{{$image}}')"
                                  src="{{asset("storage/food_store/".$image)}}">
                             <i class="fa fa-spin fa-spinner" wire:loading
-                               wire:target="changeMainI mage('{{$image}}')"></i>
+                               wire:target="changeMainImage('{{$image}}')"></i>
                             <i class="fa fa-spin fa-spinner" wire:loading
                                wire:target="delete('{{$image}}')"></i>
                             <i wire:loading.remove wire:target="delete('{{$image}}')"

@@ -3,6 +3,7 @@
 namespace App\Livewire\User;
 
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -31,7 +32,7 @@ class Profile extends Component
         $this->birthDay=$this->user->birth_day;
     }
 
-    #[Validate('image|max:5120|mimes:jpg,jpeg')]
+    #[Validate('image|max:5120|mimes:jpg,jpeg,png,webp,gif')]
     public $image;
     public $name;
     public $family;
@@ -46,7 +47,7 @@ class Profile extends Component
             'birthDay' => 'min:7|max:11|required|String',
         ];
         if ($this->image){
-            $validationArray["image"]='image|max:5120|mimes:jpg,jpeg|required';
+            $validationArray["image"]='image|max:5120|mimes:jpg,jpeg,png,webp,gif|required';
         }
         $this->validate($validationArray, [], [
             'image' => 'تصویر',
@@ -55,12 +56,21 @@ class Profile extends Component
             'nationalCode' => 'کدملی',
             'birthDay' => 'تاریخ تولد',
         ]);
-        $imageName=auth()->user()->profile_image;
+        $currentUser = auth()->user();
+        $oldImageName = $currentUser->profile_image;
+        $imageName = $oldImageName;
+
         if ($this->image){
-            $imageName = "injaa_" . time() . "." . $this->image->extension();
-            $url = $this->image->storeAs('/user', $imageName);
+            $imageName = "injaa_" . $currentUser->id . "_" . uniqid() . "." . $this->image->extension();
+            $this->image->storeAs('user', $imageName, 'public');
+
+            if ($oldImageName && $oldImageName !== $imageName && $oldImageName !== "User.png") {
+                if (Storage::disk('public')->exists('user/' . $oldImageName)) {
+                    Storage::disk('public')->delete('user/' . $oldImageName);
+                }
+            }
         }
-        auth()->user()->update([
+        $currentUser->update([
             "name"=>$this->name,
             "family"=>$this->family,
             "national_code"=>$this->nationalCode,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -80,5 +81,14 @@ class Tour extends Model
     }
     function admin(){
         return $this->hasOne(User::class,"id","user_id");
+    }
+
+    public function scopeSearch(Builder $query, $searchText){
+        return $query->where(function (Builder $builder) use ($searchText) {
+            $builder
+                ->where('title', 'like', '%' . $searchText . '%')
+                ->orWhere('address', 'like', '%' . $searchText . '%')
+                ->orWhere('id', $searchText);
+        });
     }
 }

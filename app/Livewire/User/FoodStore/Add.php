@@ -7,8 +7,6 @@ use App\Models\FoodStore;
 use App\Models\Images;
 use App\Models\OptionValue;
 use App\Models\Province;
-use App\Models\Residence;
-use App\Models\Tour;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
@@ -47,7 +45,7 @@ class Add extends Component
     public $options = [];
     public $mainImage = "";
 
-    #[Validate('image|max:5120|mimes:jpg,jpeg')]
+    #[Validate('image|max:5120|mimes:jpg,jpeg,png,webp,gif')]
     public $image;
 
     function continue()
@@ -91,17 +89,22 @@ class Add extends Component
 
     public function updatedImage()
     {
+        $this->validateOnly('image');
         if (sizeof($this->gallery)>3){
             $this->addError('image', 'تعداد تصاویر به حداکثر تعداد مجاز رسیده است.');
             return;
         }
-        $size=getimagesize($this->image->getRealPath());
+        $size=@getimagesize($this->image->getRealPath());
+        if ($size === false){
+            $this->addError('image', 'فایل انتخاب‌شده تصویر معتبر نیست.');
+            return;
+        }
         if ($size[0]<500 or $size[1]<500){
             $this->addError('image', 'حداقل عرض و ارتفاع تصویر باید 500پیکسل باشد.');
             return;
         }
         $imageName = "injaa_" . time() . "." . $this->image->extension();
-        $url = $this->image->storeAs('/public/food_store', $imageName);
+        $this->image->storeAs('food_store', $imageName, 'public');
         if (sizeof($this->gallery) == 0) {
             $this->mainImage = $imageName;
         }
@@ -116,8 +119,8 @@ class Add extends Component
 
     public function delete($image)
     {
-        if (Storage::disk('local')->exists('/public/food_store/' . $image)) {
-            Storage::disk('local')->delete('/public/food_store/' . $image);
+        if (Storage::disk('public')->exists('food_store/' . $image)) {
+            Storage::disk('public')->delete('food_store/' . $image);
         }
         unset($this->gallery[$image]);
         $this->gallery=array_values($this->gallery);
@@ -130,6 +133,12 @@ class Add extends Component
 
     public $title;
     public $id;
+
+    public function updatedProvince($province)
+    {
+        $this->city = City::where('province_id', $province)->value('id');
+        $this->resetValidation('city');
+    }
 
     function save()
     {
@@ -195,15 +204,34 @@ class Add extends Component
             "image" => $this->mainImage,
             "status" => true,
         ];
-        $residence=null;
+        $residence = null;
+        $oldImages = [];
         if ($this->id==null){
             $residence = FoodStore::create($data);
             session()->put('message', "اقامتگاه با موفقیت ثبت شد");
         }else{
-            $residence=FoodStore::find($this->id);
+            $residence = FoodStore::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$residence) {
+                session()->put('message', "رستوران موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
+
+            $oldImages = $residence->images()->pluck('url')->toArray();
             $residence->update($data);
             Images::where("store_id", $this->id)->delete();
             OptionValue::where("foodstore_id",$this->id)->delete();
+
+            $newImages = array_values($this->gallery);
+            foreach (array_diff($oldImages, $newImages) as $deletedImage) {
+                if (Storage::disk('public')->exists('food_store/' . $deletedImage)) {
+                    Storage::disk('public')->delete('food_store/' . $deletedImage);
+                }
+            }
+
             session()->put('message', "اقامتگاه با موفقیت ویرایش شد");
         }
         foreach ($this->gallery as $item) {
@@ -232,7 +260,15 @@ class Add extends Component
         $this->latLen="36.907681:50.675039";
         view()->share('title', "افزودن اقامتگاه");
         if ($this->id != null) {
-            $store=FoodStore::find($this->id);
+            $store = FoodStore::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$store) {
+                session()->put('message', "رستوران موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
 
 
 

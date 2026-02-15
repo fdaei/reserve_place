@@ -70,13 +70,13 @@ class Tools extends Component
     }
     public function add(){
         $this->validate([
-            'icon' => ['required','file', 'mimes:jpg,jpeg,png','max:5048'],
+            'icon' => ['required','file', 'mimes:jpg,jpeg,png,webp,gif','max:5048'],
             'title' => 'string|min:3|max:32|required',
         ]);
         $this->form="empty";
         $extenstion = $this->icon->getClientOriginalExtension();
         $filename = time() . "." . $extenstion;
-        $this->icon=$this->icon->storeAs("public/options" , $filename);
+        $this->icon->storeAs("options", $filename, 'public');
         Option::create([
             "title"=>$this->title,
             "icon"=>$filename,
@@ -89,13 +89,13 @@ class Tools extends Component
     }
     public function edit(){
         $this->validate([
-            'icon' => ['nullable','file', 'mimes:jpg,jpeg,png','max:5048'],
+            'icon' => ['nullable','file', 'mimes:jpg,jpeg,png,webp,gif','max:5048'],
             'title' => 'string|min:3|max:32|required',
         ]);
         if ($this->icon){
             $extenstion = $this->icon->getClientOriginalExtension();
             $filename = time() . "." . $extenstion;
-            $this->icon->storeAs("public/options" , $filename);
+            $this->icon->storeAs("options", $filename, 'public');
             $this->icon=null;
         }else
             $filename=Option::find($this->id)->icon;

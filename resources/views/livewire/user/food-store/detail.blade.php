@@ -337,6 +337,11 @@
         <div id="map"></div>
         <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
         <script>
+            if (typeof L === 'undefined') {
+                console.warn('Leaflet not loaded');
+                document.getElementById('map').innerHTML =
+                    '<div class="text-danger" style="padding:12px">نقشه لود نشد. اتصال اینترنت یا فایل‌های Leaflet را بررسی کنید.</div>';
+            } else {
             var map = L.map('map').setView([{{$model->lat}}, {{$model->lng}}], 13);
 
             // markerهای سایر مکان‌ها
@@ -398,6 +403,7 @@
                     window.open(gmapsUrl, "_blank");
                 }
             });
+            }
         </script>
 
     </div>
@@ -552,7 +558,7 @@
             swiper-slide:nth-child(3n) {
             }
         </style>
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js" onerror="this.onerror=null;this.src='{{ asset(\"/plugin/swiper-slider/swiper-element-bundle.min.js\") }}';"></script>
     </div>
     @if(session('comment'))
         @script

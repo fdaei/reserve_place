@@ -48,7 +48,7 @@ class AddResidence extends Component
     public $options = [];
     public $mainImage = "";
 
-    #[Validate('image|max:5120|mimes:jpg,jpeg')]
+    #[Validate('image|max:5120|mimes:jpg,jpeg,png,webp,gif')]
     public $image;
 
     function continue()
@@ -94,17 +94,22 @@ class AddResidence extends Component
 
     public function updatedImage()
     {
+        $this->validateOnly('image');
         if (sizeof($this->gallery)>8){
             $this->addError('image', 'تعداد تصاویر به حداکثر تعداد مجاز رسیده است.');
             return;
         }
-        $size=getimagesize($this->image->getRealPath());
+        $size=@getimagesize($this->image->getRealPath());
+        if ($size === false){
+            $this->addError('image', 'فایل انتخاب‌شده تصویر معتبر نیست.');
+            return;
+        }
         if ($size[0]<500 or $size[1]<500){
             $this->addError('image', 'حداقل عرض و ارتفاع تصویر باید 500پیکسل باشد.');
             return;
         }
         $imageName = "injaa_" . time() . "." . $this->image->extension();
-        $url = $this->image->storeAs('public/residences', $imageName);
+        $this->image->storeAs('residences', $imageName, 'public');
         if (sizeof($this->gallery) == 0) {
             $this->mainImage = $imageName;
         }
@@ -119,8 +124,8 @@ class AddResidence extends Component
 
     public function delete($image)
     {
-        if (Storage::disk('local')->exists('public/residences/' . $image)) {
-            Storage::disk('local')->delete('public/residences/' . $image);
+        if (Storage::disk('public')->exists('residences/' . $image)) {
+            Storage::disk('public')->delete('residences/' . $image);
         }
         unset($this->gallery[$image]);
         $this->gallery=array_values($this->gallery);
@@ -133,6 +138,12 @@ class AddResidence extends Component
 
     public $title;
     public $id;
+
+    public function updatedProvince($province)
+    {
+        $this->city = City::where('province_id', $province)->value('id');
+        $this->resetValidation('city');
+    }
 
     function save()
     {
@@ -169,15 +180,34 @@ class AddResidence extends Component
             "lng" => $this->latLen[1],
             "status" => true,
         ];
-        $residence=null;
+        $residence = null;
+        $oldImages = [];
         if ($this->id==null){
             $residence = Residence::create($data);
             session()->put('message', "اقامتگاه با موفقیت ثبت شد");
         }else{
-            $residence=Residence::find($this->id);
+            $residence = Residence::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$residence) {
+                session()->put('message', "اقامتگاه موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
+
+            $oldImages = $residence->images()->pluck('url')->toArray();
             $residence->update($data);
             Images::where("residence_id", $this->id)->delete();
             OptionValue::where("residence_id",$this->id)->delete();
+
+            $newImages = array_values($this->gallery);
+            foreach (array_diff($oldImages, $newImages) as $deletedImage) {
+                if (Storage::disk('public')->exists('residences/' . $deletedImage)) {
+                    Storage::disk('public')->delete('residences/' . $deletedImage);
+                }
+            }
+
             session()->put('message', "اقامتگاه با موفقیت ویرایش شد");
         }
         foreach ($this->gallery as $item) {
@@ -206,11 +236,20 @@ class AddResidence extends Component
         $this->latLen="36.907681:50.675039";
         view()->share('title', "افزودن اقامتگاه");
         if ($this->id != null) {
-            $residence=Residence::find($this->id);
+            $residence = Residence::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$residence) {
+                session()->put('message', "اقامتگاه موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
+
             $this->mainImage=$residence->image;
             $this->title=$residence->title;
             view()->share('title', $this->title);
-            $this->roomNumber=$residence->people_number;
+            $this->roomNumber=$residence->room_number;
             $this->area=$residence->area;
             $this->peopleNumber=$residence->people_number;
             $this->amount=number_format($residence->amount);

@@ -171,11 +171,13 @@
                                     </a>
                                     &nbsp;
                                     &nbsp;
-                                    <span
-                                        onclick="removeRequest(this,'{{$item->id}}','{{$item->title}}','removeFoodstore')"
+                                    <button
+                                        type="button"
+                                        wire:click="removeResidence({{ $item->id }})"
+                                        wire:confirm="از حذف کردن این اقامتگاه اطمینان دارید؟"
                                         class="btn btn-sm btn-danger">
                                         حذف
-                                    </span>
+                                    </button>
                                 </div>
                                 <span class="line"></span>
                                 <div class="services d-flex flex-row justify-content-right p-2">
@@ -221,11 +223,13 @@
                                     </a>
                                     &nbsp;
                                     &nbsp;
-                                    <span
-                                        onclick="removeRequest(this,'{{$item->id}}','{{$item->title}}','removeTour')"
+                                    <button
+                                        type="button"
+                                        wire:click="removeTour({{ $item->id }})"
+                                        wire:confirm="از حذف کردن این تور اطمینان دارید؟"
                                         class="btn btn-sm btn-danger">
                                         حذف
-                                    </span>
+                                    </button>
                                 </div>
                                 <span class="line"></span>
                                 <div class="services d-flex flex-row justify-content-right p-2">
@@ -270,11 +274,13 @@
                                     </a>
                                     &nbsp;
                                     &nbsp;
-                                    <span
-                                        onclick="removeRequest(this,'{{$item->id}}','{{$item->title}}','removeFoodstore')"
+                                    <button
+                                        type="button"
+                                        wire:click="removeFoodstore({{ $item->id }})"
+                                        wire:confirm="از حذف کردن این رستوران اطمینان دارید؟"
                                         class="btn btn-sm btn-danger">
                                         حذف
-                                    </span>
+                                    </button>
                                 </div>
                                 <span class="line"></span>
                                 <div class="services d-flex flex-row justify-content-right p-2">
@@ -320,11 +326,13 @@
                                     </a>
                                     &nbsp;
                                     &nbsp;
-                                    <span
-                                        onclick="removeRequest(this,'{{$item->id}}','{{$item->title}}','removeFoodstore')"
+                                    <button
+                                        type="button"
+                                        wire:click="removeFriend({{ $item->id }})"
+                                        wire:confirm="از حذف کردن این درخواست همسفر اطمینان دارید؟"
                                         class="btn btn-sm btn-danger">
                                         حذف
-                                    </span>
+                                    </button>
                                 </div>
                                 <span class="line"></span>
                                 <div class="services d-flex flex-row justify-content-right p-2">
@@ -398,14 +406,10 @@
             </div>
         </div>
         <div wire:ignore>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         @script
         <script>
             $("#read-messages").click(function (){
-                var tabTrigger = new bootstrap.Tab(document.getElementById('nav-tickets-tab'));
-                tabTrigger.show();
+                $("#nav-tickets-tab").trigger("click");
                 window.location.href = "#nav-tabs";
             })
             $(".nav-tabs button").click(function () {
@@ -453,28 +457,11 @@
             swiper-slide:nth-child(3n) {
             }
         </style>
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js" onerror="this.onerror=null;this.src='{{ asset(\"/plugin/swiper-slider/swiper-element-bundle.min.js\") }}';"></script>
     </div>
     <div class="col-12 "></div>
     <div class="col-12 "></div>
 
-    <script>
-        function removeRequest(tag, id, title, removeFunction = "removeResidence") {
-            Swal.fire({
-                icon: "warning",
-                title: 'هشدار',
-                text: `از حذف کردن  ${title} اطمینان دارید؟`,
-                confirmButtonText: "لغو",
-                denyButtonText: "حذف کردن",
-                showDenyButton: true,
-            }).then(res => {
-                if (res.isDenied) {
-                    Livewire.dispatch(removeFunction, {id: id})
-                }
-            })
-        }
-
-    </script>
     <br>
     <br>
     <br>

@@ -119,7 +119,7 @@
             </div>
             <div class="col-12">
                 <br>
-                <link rel="stylesheet" href="{{asset("plugin/leaflet.css")}}"/>
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
 
                 <p class="" style="font-size: 14px;opacity: .8">
                     مختصات جغرافیایی
@@ -130,38 +130,44 @@
             </span>
                 @enderror
                 <div wire:ignore id="map"></div>
-                <script src="{{asset("/plugin/leaflet.js")}}"></script>
+                <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
                 <script>
-                    var letLng=[{{ $latLen!=""?explode(":", $latLen)[0]:"36.907681"}},{{ $latLen!=""?explode(":", $latLen)[1]:"50.675039"}}];
-                    console.log(letLng)
-                    var map = L.map('map').setView(letLng, 12);
+                    if (typeof L === 'undefined') {
+                        console.warn('Leaflet not loaded');
+                        document.getElementById('map').innerHTML =
+                            '<div class="text-danger" style="padding:12px">نقشه لود نشد. اتصال اینترنت یا فایل‌های Leaflet را بررسی کنید.</div>';
+                    } else {
+                        var letLng=[{{ $latLen!=""?explode(":", $latLen)[0]:"36.907681"}},{{ $latLen!=""?explode(":", $latLen)[1]:"50.675039"}}];
+                        console.log(letLng)
+                        var map = L.map('map').setView(letLng, 12);
 
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
-                    var marker;
-                    var customIcon = L.icon({
-                        iconUrl: '{{ asset("storage/".getConfigs("markerMapIcon")) }}',
-                        iconSize: [48, 48],
-                        iconAnchor: [16, 32],
-                        popupAnchor: [0, -32],
-                    });
-                        if (marker) {
-                            map.removeLayer(marker);
-                        }
-                        marker = L.marker(letLng, {icon: customIcon}).addTo(map);
-                    map.on('click', function (e) {
-                        var lat = e.latlng.lat.toFixed(6);
-                        var lng = e.latlng.lng.toFixed(6);
-                        if (marker) {
-                            map.removeLayer(marker);
-                        }
-                        marker = L.marker([lat, lng], {icon: customIcon}).addTo(map);
-                        console.log([lat , lng])
-                    @this.set('latLen', lat + ":" + lng)
-                        ;
-                    });
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+                        var marker;
+                        var customIcon = L.icon({
+                            iconUrl: '{{ asset("storage/".getConfigs("markerMapIcon")) }}',
+                            iconSize: [48, 48],
+                            iconAnchor: [16, 32],
+                            popupAnchor: [0, -32],
+                        });
+                            if (marker) {
+                                map.removeLayer(marker);
+                            }
+                            marker = L.marker(letLng, {icon: customIcon}).addTo(map);
+                        map.on('click', function (e) {
+                            var lat = e.latlng.lat.toFixed(6);
+                            var lng = e.latlng.lng.toFixed(6);
+                            if (marker) {
+                                map.removeLayer(marker);
+                            }
+                            marker = L.marker([lat, lng], {icon: customIcon}).addTo(map);
+                            console.log([lat , lng])
+                        @this.set('latLen', lat + ":" + lng)
+                            ;
+                        });
+                    }
 
                 </script>
             </div>
@@ -183,9 +189,9 @@
                     <label for="file-upload"
                            class="{{sizeof($gallery)>=8?"op-5":""}} custom-upload-btn">آپلود
                         فایل</label>
-                    <input {{sizeof($gallery)>=8?"disabled":""}} wire:loading.attr="image"
+                    <input {{sizeof($gallery)>=8?"disabled":""}} wire:loading.attr="disabled"
                            wire:target="image" wire:model.live="image"
-                           type="file" id="file-upload" accept="image/jpeg" class="file-input"/>
+                           type="file" id="file-upload" accept="image/jpeg,image/png,image/webp,image/gif" class="file-input"/>
 
                     <div style="width: 100%" x-show="uploading">
                         <progress style="width: 100%" max="100" x-bind:value="progress"></progress>

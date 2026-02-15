@@ -22,10 +22,11 @@
                 </span>
                 <br>
                 <span style="">
-                    PNG یا JPG حداکثر 800 مگاپیکسل
+                    PNG یا JPG یا WEBP یا GIF
                 </span>
                 <div>
-                    <input wire:model.live="image" accept="image/jpeg" type="file" class="bg-c1">
+                    <input wire:model.live="image" wire:loading.attr="disabled"
+                           accept="image/jpeg,image/png,image/webp,image/gif" type="file" class="bg-c1">
                 </div>
             </div>
 

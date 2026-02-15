@@ -28,8 +28,13 @@ class Index extends Component
         $this->provinces=Province::where("is_use",true)->where("country_id",1)->get()->keyBy("id");
         $this->cities=City::where("is_use",true)->get()->keyBy("id");
         $query = \App\Models\FoodStore::query();
-        if ($this->a != 0) {
-            $query->orderBy("amount", $this->a == 1 ? "ASC" : "DESC");
+        $sortType = (int)$this->a;
+        if ($sortType === 1) {
+            $query->orderBy("id", "DESC");
+        } elseif ($sortType === 2) {
+            $query->orderBy("id", "ASC");
+        } elseif ($sortType === 3) {
+            $query->orderBy("point", "DESC")->orderBy("id", "DESC");
         } else {
             $query->orderBy("id", "DESC");
         }
@@ -43,7 +48,7 @@ class Index extends Component
             }
         }
 
-        $stores = $query->orderBy("id", "DESC")->paginate(getConfigs("paginationItemCount",12));
+        $stores = $query->paginate(getConfigs("paginationItemCount",12));
 
         return view('livewire.user.food-store.index',["list"=>$stores])
             ->extends("app")
@@ -57,10 +62,16 @@ class Index extends Component
     public function search(){
         $this->resetPage();
     }
+
+    public function filter(){
+        $this->resetPage();
+    }
+
     public function updatedC(){
         $this->resetPage();
     }
     public function updatedP(){
+        $this->c = 0;
         $this->resetPage();
     }
     public function updatedN(){

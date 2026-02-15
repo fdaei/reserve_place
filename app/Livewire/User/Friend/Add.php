@@ -54,7 +54,7 @@ class Add extends Component
     ];
     public $mainImage = "";
 
-    #[Validate('image|max:5120|mimes:jpg,jpeg')]
+    #[Validate('image|max:5120|mimes:jpg,jpeg,png,webp,gif')]
     public $image;
 
     function continue()
@@ -110,17 +110,22 @@ class Add extends Component
 
     public function updatedImage()
     {
+        $this->validateOnly('image');
         if (sizeof($this->gallery)>1){
             $this->addError('image', 'تعداد تصاویر به حداکثر تعداد مجاز رسیده است.');
             return;
         }
-        $size=getimagesize($this->image->getRealPath());
+        $size=@getimagesize($this->image->getRealPath());
+        if ($size === false){
+            $this->addError('image', 'فایل انتخاب‌شده تصویر معتبر نیست.');
+            return;
+        }
         if ($size[0]<500 or $size[1]<500){
             $this->addError('image', 'حداقل عرض و ارتفاع تصویر باید 500پیکسل باشد.');
             return;
         }
         $imageName = "injaa_" . time() . "." . $this->image->extension();
-        $url = $this->image->storeAs('public/friends', $imageName);
+        $this->image->storeAs('friends', $imageName, 'public');
         if (sizeof($this->gallery) == 0) {
             $this->mainImage = $imageName;
         }
@@ -135,8 +140,8 @@ class Add extends Component
 
     public function delete($image)
     {
-        if (Storage::disk('local')->exists('public/friends/' . $image)) {
-            Storage::disk('local')->delete('public/friends/' . $image);
+        if (Storage::disk('public')->exists('friends/' . $image)) {
+            Storage::disk('public')->delete('friends/' . $image);
         }
         unset($this->gallery[$image]);
         $this->gallery=array_values($this->gallery);
@@ -219,15 +224,34 @@ class Add extends Component
             "image"=>$this->mainImage,
             "status" => true,
         ];
-        $model=null;
+        $model = null;
+        $oldImages = [];
         if ($this->id==null){
             $model = Friend::create($data);
             session()->put('message', "درخواست همسفر با موفقیت ثبت شد");
         }else{
-            $model=Friend::find($this->id);
+            $model = Friend::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$model) {
+                session()->put('message', "درخواست همسفر موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
+
+            $oldImages = $model->images()->pluck('url')->toArray();
             $model->update($data);
             Images::where("friend_id", $this->id)->delete();
             OptionValue::where("friend_id",$this->id)->delete();
+
+            $newImages = array_values($this->gallery);
+            foreach (array_diff($oldImages, $newImages) as $deletedImage) {
+                if (Storage::disk('public')->exists('friends/' . $deletedImage)) {
+                    Storage::disk('public')->delete('friends/' . $deletedImage);
+                }
+            }
+
             session()->put('message', "رخواست همسفر با موفقیت ویرایش شد");
         }
         foreach ($this->gallery as $item) {
@@ -254,7 +278,16 @@ class Add extends Component
         $this->id=$id;
         view()->share('title', "افزودن اقامتگاه");
         if ($this->id != null) {
-            $model=Friend::find($this->id);
+            $model = Friend::where('id', $this->id)
+                ->where('user_id', auth()->id())
+                ->first();
+
+            if (!$model) {
+                session()->put('message', "درخواست همسفر موردنظر یافت نشد");
+                Redirect::to("/dashboard");
+                return;
+            }
+
             $this->title=$model->title;
             $this->country=$model->country_id;
             $this->province=$model->province_id;
@@ -264,7 +297,7 @@ class Add extends Component
             $this->myAge=$model->my_age;
             $this->friendGender=$model->friend_gender;
             $this->machineType=$model->machine_type;
-            $this->startDateValidatio=$model->start_date;
+            $this->startDateValidation=$model->start_date;
             $gregorianDate = new \DateTime($model->start_date);
             $jalaliDate = \Morilog\Jalali\Jalalian::fromDateTime($gregorianDate);
             $this->startDate=$jalaliDate->format('%Y/%m/%d');

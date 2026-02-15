@@ -248,3 +248,17 @@ a {
         }
     }
 }
+
+/* Fallback layout when Swiper web-components script is unavailable */
+swiper-container:not(:defined) {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+swiper-container:not(:defined) swiper-slide {
+    flex: 0 0 auto;
+    display: block;
+}
