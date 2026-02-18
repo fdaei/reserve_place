@@ -5,8 +5,8 @@ namespace App\Livewire\User;
 use App\Models\User;
 use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
+use Ipe\Sdk\Facades\SmsIr;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -51,11 +51,7 @@ class Login extends Component
             ]
         ];
         // dd(env("LOG_CHANNEL"));
-        // SMS gateway disabled (no network). Log the verification code instead.
-        Log::error('SMSIR disabled - verification code generated', [
-            'phone' => $this->phone,
-            'code' => $randNumber,
-        ]);
+        $response = SmsIr::verifySend($this->phone, $templateId, $parameters);
         VerificationCode::create([
             "phone"=>convertPersianToEnglishNumbers($this->phone),
             "code"=>$randNumber,
