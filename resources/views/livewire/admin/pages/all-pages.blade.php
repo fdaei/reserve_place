@@ -1,170 +1,129 @@
-<div class="section">
-    <h2>
-        <i class="fas fa-file-word-o"></i>
-        صفحات
-    </h2>
-    <div class="" id="collapseExample">
-        <div class="card card-body">
+<div class="pages-library">
+    <section class="section">
+        <div class="admin-section-head">
+            <div>
+                <h2 class="pages-section-title">
+                    <i class="fa fa-files-o"></i>
+                    کتابخانه صفحات
+                </h2>
+                <p>همه صفحات ثابت سایت را از این بخش جستجو، ویرایش یا حذف کنید.</p>
+            </div>
 
-            <div class="row flex-nowrap flex-row justify-content-between">
-                <div style="margin: 4px">
-                    <label>نام:
-                        <input type="text" wire:model.live="search" class="form-control">
-                    </label>
-                </div>
-                <div>
-                    <br>
-                    <a href="{{\Illuminate\Support\Facades\URL::to("admin/pages/0")}}" class="btn btn-primary">
-                        افزودن
-                    </a>
-                </div>
+            <div class="pages-head-actions">
+                <a href="{{ url('admin/pages') }}" class="btn btn-primary">ویرایشگر صفحات</a>
             </div>
         </div>
-    </div>
 
-    <table class="table responsive-table">
-        <thead class="thead-dark">
-        <tr>
-            <th>ID</th>
-            <th>عنوان</th>
-            <th>آدرس</th>
-            <th>وضعیت</th>
-            <th>تعداد بازدید</th>
-            <th>تاریخ ثبت</th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($list as $item)
+        <div class="pages-library-toolbar">
+            <div class="pages-library-search">
+                <label for="pages-search">جستجو در صفحات</label>
+                <input
+                    id="pages-search"
+                    type="text"
+                    wire:model.live.debounce.300ms="search"
+                    class="form-control"
+                    placeholder="جستجو در عنوان یا آدرس صفحه"
+                >
+            </div>
+        </div>
 
-            <tr>
-                <td data-label="Id">{{$item->id}}</td>
-                <td data-label="عنوان">{{$item->title}}</td>
-                <td data-label="آدرس">{{$item->url_title}}</td>
-                <td data-label="وضعیت">
-                                <span class="   {{$item->status==0?"text-warning":"text-success"}}">
-                                    {{$item->status==0?"غیرفعال":""}}
-                                    {{$item->status==1?"فعال":""}}
+        @if($list->count())
+            <div class="pages-library-table-wrap">
+                <table class="table responsive-table pages-library-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>عنوان</th>
+                        <th>وضعیت</th>
+                        <th>بازدید</th>
+                        <th>تاریخ ثبت</th>
+                        <th>عملیات</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($list as $item)
+                        @php
+                            $jalaliDate = \Morilog\Jalali\Jalalian::fromCarbon($item->created_at);
+                        @endphp
+                        <tr>
+                            <td data-label="ID">{{ $item->id }}</td>
+                            <td data-label="عنوان">
+                                <div class="pages-library-title-cell">
+                                    <strong>{{ $item->title }}</strong>
+                                    <span>{{ $item->url_text }}</span>
+                                </div>
+                            </td>
+                            <td data-label="وضعیت">
+                                <span @class(['status-chip', 'active' => (int) $item->status === 1, 'inactive' => (int) $item->status === 0])>
+                                    {{ (int) $item->status === 1 ? 'فعال' : 'غیرفعال' }}
                                 </span>
-                </td>
-                <td data-label="بازدید">{{$item->visit_count}}
-                بازدید</td>
-                @php
-                    $gregorianDate = new \DateTime($item["created_at"]);
-                    $jalaliDate = \Morilog\Jalali\Jalalian::fromDateTime($gregorianDate);
-                @endphp
-                <td data-label="تاریخ ثبت">
-                    {{$jalaliDate->format('%Y/%m/%d')}}
-                    <br>
-                    <span class="op-5">
-                            {{$jalaliDate->format('H:i')}}
-                            </span>
-                </td>
-                <td data-label="">
-                    <a href="{{\Illuminate\Support\Facades\URL::to("admin/pages/".$item->id)}}" class="btn btn-sm btn-primary" >
-                        مشاهده
-                    </a>
-                </td>
-            </tr>
-        @endforeach
-        </tbody>
-    </table>
+                            </td>
+                            <td data-label="بازدید">{{ number_format($item->visit_count) }} بازدید</td>
+                            <td data-label="تاریخ ثبت">
+                                {{ $jalaliDate->format('%Y/%m/%d') }}
+                                <br>
+                                <span class="op-5">{{ $jalaliDate->format('H:i') }}</span>
+                            </td>
+                            <td data-label="عملیات">
+                                <div class="pages-library-actions">
+                                    <a href="{{ url('admin/pages/' . $item->id) }}" class="btn btn-sm btn-primary">ویرایش</a>
+                                    <a href="{{ url('/p/' . $item->url_text) }}" class="btn btn-sm btn-secondary" target="_blank" rel="noopener noreferrer">نمایش</a>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmPageRemoval({{ $item->id }}, @js($item->title))">حذف</button>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-    <div class="card">
-        <div class="card-body">
-            {{$list->links('vendor.pagination.default')}}
-        </div>
-    </div>
-    <div class="modal fade {{$form!="empty"?"show":""}}" id="exampleModal" tabindex="-1"
-         aria-labelledby="exampleModalLabel" aria-hidden="true"
-         style="{{$form!="empty"?"display: block;":""}}">
-        <div class="modal-dialog">
-            <form wire:submit="{{$form}}" class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                        @if($form=="add")
-                            افزودن استان
-                        @else
-                            ویرایش استان
-                        @endif
-                    </h5>
-                    <span wire:click="setForm('empty')" type="button" class="close"
-                          data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </span>
+            @if($list->hasPages())
+                <div class="pages-library-pagination">
+                    {{ $list->links('vendor.pagination.default') }}
                 </div>
-                <div class="modal-body">
-                    <div style="margin: 4px">
-                        <label>نام:
-                            <input type="text" wire:model="title" class="form-control">
-                        </label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <span wire:click="setForm('empty')" type="button" class="btn btn-secondary"
-                          data-dismiss="modal">لغو</span>
-                    <button class="btn btn-primary">ذخیره</button>
-                </div>
-            </form>
-        </div>
-    </div>
+            @endif
+        @else
+            <div class="admin-empty-state">
+                <h4>صفحه‌ای پیدا نشد</h4>
+                <p>عبارت جستجو را تغییر دهید یا یک صفحه جدید بسازید.</p>
+            </div>
+        @endif
+    </section>
 
     @script
     <script>
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer)
-                toast.addEventListener('mouseleave', Swal.resumeTimer)
-            }
-        })
-        $(document).on("click", ".btn-danger", function () {
-            let id = $(this).attr("data-id")
-            let title = $(this).attr("data-title")
+        window.confirmPageRemoval = function (id, title) {
             Swal.fire({
-                icon: "warning",
-                title: 'هشدار',
-                text: `از حذف کردن  ${title} اطمینان دارید؟`,
-                confirmButtonText: "لغو",
-                denyButtonText: "حذف کردن",
-                showDenyButton: true,
-                background: '#333',
-                color: '#fff',
-                confirmButtonColor: '#3085d6',
-            }).then(res => {
-                if (res.isDenied) {
-                    Livewire.dispatch("remove", {id: id});
-                    Livewire.on('componentName', (data) => {
-                        console.log(data.title); // خروجی: blog-component
-                    });
+                icon: 'warning',
+                title: 'حذف صفحه',
+                text: `از حذف «${title}» مطمئن هستید؟`,
+                showCancelButton: true,
+                confirmButtonText: 'حذف صفحه',
+                cancelButtonText: 'انصراف',
+                confirmButtonColor: '#ef4444',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch('remove', { id: id });
                 }
-            })
-        });
+            });
+        };
 
-        Livewire.on("edited", event => {
-            Toast.fire({
-                icon: 'success',
-                title: 'اطلاعات با موفقیت بروز شد'
-            })
-        })
-        Livewire.on("create", event => {
-            Toast.fire({
-                icon: 'success',
-                title: 'اطلاعات موفقیت ثبت شد'
-            })
-        })
+        if (!window.__pagesLibraryToastBound) {
+            window.__pagesLibraryToastBound = true;
 
-        Livewire.on("removed", event => {
-            Toast.fire({
-                icon: 'success',
-                title: 'سطر با موفقیت حذف شد'
-            })
-        })
+            Livewire.on('removed', () => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'صفحه با موفقیت حذف شد',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                });
+            });
+        }
     </script>
     @endscript
-
 </div>

@@ -1,89 +1,104 @@
-<div>
-    <div class="header">
-        <h1>داشبورد مدیریت</h1>
-        <div class="user-profile">
-            <i class="fas fa-user-circle fa-2x"></i>
-        </div>
-    </div>
+<div class="section">
+    <h3>
+        <i class="fas fa-chart-pie"></i>
+        داشبورد مدیریت
+    </h3>
+
     @php
         use Carbon\Carbon;
-        $users=\App\Models\User::all();
-        $todayUsers = \App\Models\User::whereDate('created_at', Carbon::today())->get();
-        $residences=\App\Models\Residence::all();
-        $todayResidences = \App\Models\Residence::whereDate('created_at', Carbon::today())->get();
-        $calls=\App\Models\CallResidences::where("type","residence")->get();
-        $todayCalls = \App\Models\CallResidences::where("type","residence")->whereDate('created_at', Carbon::today())->get();
 
-        $callsTour=\App\Models\CallResidences::where("type","tour")->get();
-        $todayCallsTour = \App\Models\CallResidences::where("type","tour")->whereDate('created_at', Carbon::today())->get();
+        $today = Carbon::today();
+        $usersCount = \App\Models\User::count();
+        $todayUsersCount = \App\Models\User::whereDate('created_at', $today)->count();
+        $residencesCount = \App\Models\Residence::count();
+        $todayResidencesCount = \App\Models\Residence::whereDate('created_at', $today)->count();
 
-        $callsFriend=\App\Models\CallResidences::where("type","friend")->get();
-        $todayCallsFriend = \App\Models\CallResidences::where("type","friend")->whereDate('created_at', Carbon::today())->get();
+        $callsResidenceCount = \App\Models\CallResidences::where('type', 'residence')->count();
+        $todayCallsResidenceCount = \App\Models\CallResidences::where('type', 'residence')->whereDate('created_at', $today)->count();
 
-        $callsStore=\App\Models\CallResidences::where("type","store")->get();
-        $todayCallsStore = \App\Models\CallResidences::where("type","store")->whereDate('created_at', Carbon::today())->get();
+        $callsTourCount = \App\Models\CallResidences::where('type', 'tour')->count();
+        $todayCallsTourCount = \App\Models\CallResidences::where('type', 'tour')->whereDate('created_at', $today)->count();
+
+        $callsFriendCount = \App\Models\CallResidences::where('type', 'friend')->count();
+        $todayCallsFriendCount = \App\Models\CallResidences::where('type', 'friend')->whereDate('created_at', $today)->count();
+
+        $callsStoreCount = \App\Models\CallResidences::where('type', 'store')->count();
+        $todayCallsStoreCount = \App\Models\CallResidences::where('type', 'store')->whereDate('created_at', $today)->count();
     @endphp
-    <div class="stats-boxes">
-        <div class="stat-box">
-            <h4>کل کاربران</h4>
-            <p class="stat-value">{{$users->count()}}</p>
-            <i class="fas fa-users fa-2x"></i>
-        </div>
-        <div class="stat-box">
-            <h4>کاربران امروز</h4>
-            <p class="stat-value">{{$todayUsers->count()}}</p>
-            <i class="fas fa-users fa-2x"></i>
-        </div>
-        <div class="stat-box">
-            <h4>کل اقامتگاه ها</h4>
-            <p class="stat-value">{{$residences->count()}}</p>
-            <i class="fas fa-home fa-2x"></i>
-        </div>
-        <div class="stat-box">
-            <h4>اقامتگاه های امروز</h4>
-            <p class="stat-value">{{$todayResidences->count()}}</p>
-            <i class="fas fa-home fa-2x"></i>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <h4>کاربران</h4>
+                <span class="stat-badge badge-free">عضویت</span>
+            </div>
+            <p class="stat-number">{{ $usersCount }}</p>
+            <div class="stat-footer">
+                <span>کل: {{ $usersCount }}</span>
+                <span>امروز: {{ $todayUsersCount }}</span>
+            </div>
+            <i class="fas fa-users fa-2x stat-icon"></i>
         </div>
 
-        <div class="stat-box">
-            <h4>تماس های اقامتگاه ها</h4>
-            <p class="stat-value">{{$calls->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
+        <div class="stat-card">
+            <div class="stat-header">
+                <h4>اقامتگاه‌ها</h4>
+                <span class="stat-badge badge-broker">محتوا</span>
+            </div>
+            <p class="stat-number">{{ $residencesCount }}</p>
+            <div class="stat-footer">
+                <span>کل: {{ $residencesCount }}</span>
+                <span>امروز: {{ $todayResidencesCount }}</span>
+            </div>
+            <i class="fas fa-building fa-2x stat-icon"></i>
         </div>
-        <div class="stat-box">
-            <h4>تماس های امروز اقامتگاه ها</h4>
-            <p class="stat-value">{{$todayCalls->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h4>تماس اقامتگاه</h4>
+            </div>
+            <p class="stat-number">{{ $callsResidenceCount }}</p>
+            <div class="stat-footer">
+                <span>کل: {{ $callsResidenceCount }}</span>
+                <span>امروز: {{ $todayCallsResidenceCount }}</span>
+            </div>
+            <i class="fas fa-phone-volume fa-2x stat-icon"></i>
         </div>
-        <div class="stat-box">
-            <h4>تماس های تور ها</h4>
-            <p class="stat-value">{{$callsTour->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h4>تماس تور</h4>
+            </div>
+            <p class="stat-number">{{ $callsTourCount }}</p>
+            <div class="stat-footer">
+                <span>کل: {{ $callsTourCount }}</span>
+                <span>امروز: {{ $todayCallsTourCount }}</span>
+            </div>
+            <i class="fas fa-bus fa-2x stat-icon"></i>
         </div>
-        <div class="stat-box">
-            <h4>تماس های امروز تور ها</h4>
-            <p class="stat-value">{{$todayCallsTour->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h4>تماس همسفر</h4>
+            </div>
+            <p class="stat-number">{{ $callsFriendCount }}</p>
+            <div class="stat-footer">
+                <span>کل: {{ $callsFriendCount }}</span>
+                <span>امروز: {{ $todayCallsFriendCount }}</span>
+            </div>
+            <i class="fas fa-users-line fa-2x stat-icon"></i>
         </div>
-        <div class="stat-box">
-            <h4>تماس های تور ها</h4>
-            <p class="stat-value">{{$callsFriend->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
-        </div>
-        <div class="stat-box">
-            <h4>تماس های امروز تور ها</h4>
-            <p class="stat-value">{{$todayCallsFriend->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
-        </div>
-        <div class="stat-box">
-            <h4>تماس های رستوران ها</h4>
-            <p class="stat-value">{{$callsStore->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
-        </div>
-        <div class="stat-box">
-            <h4>تماس های امروز رستوران ها</h4>
-            <p class="stat-value">{{$todayCallsStore->count()}}</p>
-            <i class="fas fa-comments fa-2x"></i>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <h4>تماس رستوران</h4>
+            </div>
+            <p class="stat-number">{{ $callsStoreCount }}</p>
+            <div class="stat-footer">
+                <span>کل: {{ $callsStoreCount }}</span>
+                <span>امروز: {{ $todayCallsStoreCount }}</span>
+            </div>
+            <i class="fas fa-utensils fa-2x stat-icon"></i>
         </div>
     </div>
 </div>

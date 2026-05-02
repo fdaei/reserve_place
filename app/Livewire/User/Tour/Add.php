@@ -197,13 +197,13 @@ class Add extends Component
             "tour_time_frame"=>$this->tourTimeFrame,
             "open_tour_time"=>$this->openTourTime,
             "expire_date"=>$this->tourTimeFrame=="one"?$this->openTourTime:null,
-            "status" => true,
         ];
         $tour = null;
         $oldImages = [];
         if ($this->id==null){
+            $data["status"] = 0;
             $tour = Tour::create($data);
-            session()->put('message', "تور با موفقیت ثبت شد");
+            session()->put('message', "تور ثبت شد و پس از تایید در سایت نمایش داده می‌شود");
         }else{
             $tour = Tour::where('id', $this->id)
                 ->where('user_id', auth()->id())
@@ -216,6 +216,7 @@ class Add extends Component
             }
 
             $oldImages = $tour->images()->pluck('url')->toArray();
+            $data["status"] = $tour->status;
             $tour->update($data);
             Images::where("tour_id", $this->id)->delete();
 
@@ -234,6 +235,8 @@ class Add extends Component
                 "tour_id" => $tour->id
             ]);
         }
+        auth()->user()?->assignHostRole();
+
         Redirect::to("/dashboard");
     }
     function mount($id=null)

@@ -15,9 +15,27 @@ class Detail extends Component
 
     public $model;
 
+    private function findVisibleTour()
+    {
+        if (auth()->check() && auth()->user()->canManageContent()) {
+            return Tour::find($this->id);
+        }
+
+        return Tour::query()
+            ->where('id', $this->id)
+            ->where(function ($query) {
+                $query->where('status', 1);
+
+                if (auth()->check()) {
+                    $query->orWhere('user_id', auth()->id());
+                }
+            })
+            ->first();
+    }
+
 
     public function mount(){
-        $this->model=Tour::find($this->id);
+        $this->model = $this->findVisibleTour();
         if (!$this->model){
             abort(404);
         }
@@ -26,7 +44,10 @@ class Detail extends Component
         view()->share('title', $this->model->title);
     }
     public function render(){
-        $this->model=Tour::find($this->id);
+        $this->model = $this->findVisibleTour();
+        if (!$this->model){
+            abort(404);
+        }
         return view('livewire.user.tour.detail')
             ->extends("app")
             ->section("content");

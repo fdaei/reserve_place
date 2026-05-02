@@ -27,7 +27,7 @@ class Index extends Component
 
         $this->provinces=Province::where("is_use",true)->where("country_id",1)->get()->keyBy("id");
         $this->cities=City::where("is_use",true)->get()->keyBy("id");
-        $query = \App\Models\FoodStore::query();
+        $query = \App\Models\FoodStore::query()->where("status", 1);
         $sortType = (int)$this->a;
         if ($sortType === 1) {
             $query->orderBy("id", "DESC");

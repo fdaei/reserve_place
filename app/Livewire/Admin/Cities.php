@@ -87,10 +87,4 @@ class Cities extends Component
         $this->setForm("empty");
         $this->dispatch("edited");
     }
-    public function mount()
-    {
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
-    }
 }

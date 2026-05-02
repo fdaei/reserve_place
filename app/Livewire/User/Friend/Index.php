@@ -24,7 +24,7 @@ class Index extends Component{
 
         $this->countries=Country::all()->keyBy("id");
         $this->provinces=Province::all()->keyBy("id");
-        $query = \App\Models\Friend::query();
+        $query = \App\Models\Friend::query()->where("status", 1);
         if ($this->searchText != "") {
             $query->search($this->searchText);
         }

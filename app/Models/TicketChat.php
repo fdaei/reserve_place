@@ -14,4 +14,14 @@ class TicketChat extends Model
         "seen",
         "user_id",
     ];
+
+    public function ticket()
+    {
+        return $this->belongsTo(Ticket::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

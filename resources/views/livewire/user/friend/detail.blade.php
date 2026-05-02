@@ -347,7 +347,7 @@
             $provinces=\App\Models\Province::where("is_use",true)->get()->keyBy("id");
         @endphp
         
-        @foreach(\App\Models\Residence::where("province_id",$model->province_id)->limit(5)->get() as $residence)
+        @foreach(\App\Models\Residence::where("province_id",$model->province_id)->where("status", true)->limit(5)->get() as $residence)
             <swiper-slide>
                 <div>
                     <h3>{{$residence->title}}</h3>
@@ -402,7 +402,7 @@
     </swiper-container>
     
     @php
-        $foodstores=\App\Models\FoodStore::where("province_id",$model->province_id)->limit(5)->get()
+        $foodstores=\App\Models\FoodStore::where("province_id",$model->province_id)->where("status", 1)->limit(5)->get()
     @endphp
     
     @if(!$foodstores->isEmpty())

@@ -290,6 +290,18 @@
                 <label class="{{!$hasComment and auth()->check()?"active":""}}" for="star1"
                        onclick="showDesc('desc1')">&#9733;</label>
             </div>
+            <div class="mt-3">
+                <textarea
+                    {{$hasComment==true?"disabled":""}}
+                    {{!auth()->check()?"disabled":""}}
+                    wire:model.defer="commentBody"
+                    class="form-control"
+                    rows="4"
+                    placeholder="نظر شما درباره این رستوران"></textarea>
+                @error('commentBody')
+                    <small class="text-danger d-block mt-2">{{ $message }}</small>
+                @enderror
+            </div>
             <div class="" style="padding-top: 17px">
                 <button {{$hasComment==true?"disabled":""}}  wire:click="submitPoint"
                         {{!auth()->check()?"disabled":""}} class="btn btn-sm btn-success">ثبت امتیاز
@@ -436,7 +448,7 @@
             $cities=\App\Models\City::where("is_use",true)->get()->keyBy("id");
             $provinces=\App\Models\Province::where("is_use",true)->get()->keyBy("id");
         @endphp
-        @foreach(\App\Models\Residence::where("city_id",$model->city_id)->limit(5)->get() as $residence)
+        @foreach(\App\Models\Residence::where("city_id",$model->city_id)->where("status", true)->limit(5)->get() as $residence)
 
             <swiper-slide>
                 <div>
@@ -491,7 +503,7 @@
         @endforeach
     </swiper-container>
     @php
-        $foodstores=\App\Models\FoodStore::where("city_id",$model->city_id)->limit(5)->get()
+        $foodstores=\App\Models\FoodStore::where("city_id",$model->city_id)->where("status", 1)->limit(5)->get()
     @endphp
     @if(!$foodstores->isEmpty())
         <div class="bg-c3" style="height: 3px;margin-top: 20px"></div>
@@ -558,7 +570,7 @@
             swiper-slide:nth-child(3n) {
             }
         </style>
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js" onerror="this.onerror=null;this.src='{{ asset(\"/plugin/swiper-slider/swiper-element-bundle.min.js\") }}';"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js" onerror="this.onerror=null;this.src='{{ asset('/plugin/swiper-slider/swiper-element-bundle.min.js') }}';"></script>
     </div>
     @if(session('comment'))
         @script

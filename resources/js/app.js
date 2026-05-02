@@ -1,13 +1,76 @@
+import $ from 'jquery'
 import 'bootstrap-v4-rtl/dist/js/bootstrap.min.js'
 import 'bootstrap-v4-rtl/dist/css/bootstrap-rtl.min.css'
 import 'lottie-web/build/player/lottie.js'
 import 'font-awesome-4/css/font-awesome.min.css'
 import 'jquery-ui';
 import Swal from 'sweetalert2'
+import { initAdminFormTools } from './admin-form-tools'
 
-window.Swal=Swal;
+window.$ = window.jQuery = $;
+window.Swal = Swal;
 
+initAdminFormTools();
 
+function initAdminSidebarAccordion() {
+    document.querySelectorAll('[data-admin-menu-section]').forEach((section) => {
+        if (section.dataset.bound === 'true') {
+            return;
+        }
+
+        section.addEventListener('toggle', () => {
+            if (!section.open) {
+                return;
+            }
+
+            document.querySelectorAll('[data-admin-menu-section]').forEach((otherSection) => {
+                if (otherSection !== section) {
+                    otherSection.open = false;
+                }
+            });
+        });
+
+        section.dataset.bound = 'true';
+    });
+}
+
+function initConfirmableForms() {
+    document.querySelectorAll('form[data-confirm]').forEach((form) => {
+        if (form.dataset.bound === 'true') {
+            return;
+        }
+
+        form.addEventListener('submit', (event) => {
+            if (form.dataset.confirmed === 'true') {
+                return;
+            }
+
+            event.preventDefault();
+
+            Swal.fire({
+                title: form.dataset.confirmTitle || 'تأیید عملیات',
+                text: form.dataset.confirm || 'از انجام این عملیات اطمینان دارید؟',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: form.dataset.confirmButton || 'تأیید',
+                cancelButtonText: 'انصراف',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.dataset.confirmed = 'true';
+                    form.submit();
+                }
+            });
+        });
+
+        form.dataset.bound = 'true';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initAdminSidebarAccordion();
+    initConfirmableForms();
+});
 
 let failedlottie = document.getElementById("failed-lottie")
 let successlottie = document.getElementById("success-lottie")
@@ -15,20 +78,20 @@ let successlottie = document.getElementById("success-lottie")
 function successfullymodal(text) {
     $("#succes-dialog .modal-body p").html(text)
     $("#succes-dialog").modal("show")
-    successlottie.play()
+    successlottie?.play()
 }
 
 function failedmodal(text) {
     $("#failed-dialog .modal-body p").html(text)
     $("#failed-dialog").modal("show")
-    failedlottie.play()
+    failedlottie?.play()
 }
 
 $('#succes-dialog').on('hidden.bs.modal', function () {
-    successlottie.stop()
+    successlottie?.stop()
 })
 $('#failed-dialog').on('hidden.bs.modal', function () {
-    failedlottie.stop()
+    failedlottie?.stop()
 })
 
 function isemail(email) {
@@ -50,49 +113,19 @@ function unsetloadingbutton(btn) {
 }
 
 function redirect(page) {
-    window.location.replace( page
-    )
+    window.location.replace(page)
 }
 
 $("#hide-failed-modal-btn").click(function () {
     $("#failed-dialog").modal("hide")
 })
 
+var numberformat = (price) => price.toLocaleString('en-US');
 
-var numberformat = (price) => price.tolocalestring('en-us');
-
-
-function numberwithcommas(field) {
-    // get the input field id
-    let element = document.getelementbyid(field.id);
-    // replace all the commas of input field value with empty value
-    // and assign it to amount variable
-    let amount = element.value.replace(/,/g, '');
-
-    // check if the amount contains (-) sign in the beginning
-    if (amount.charat(0) == '-') {
-        // if amount contains (-) sign, remove first character then replace all
-        // (-) signs from the amount with empty value & concate (-) in amount
-        amount = '-' + amount.substring(1).replace(/-/g, '');
-    } else {
-        // replace all (-) signs from the amount with empty value
-        amount = amount.replace(/-/g, '');
-    }
-
-    // first add commas into the amount then update the input field value
-    element.value =
-        amount.tostring().replace(/\b(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-}
-
-$(document).ready(function () {
-    // accept only numbers, commas & (-) minus sign
-    $(".numbers").on("keypress keyup blur", function (event) {
-        $(this).val($(this).val().replace(/[^-\d,]+/g, ""));
-        if ((event.which < 48 || event.which > 57) &&
-            event.which != 44 && event.which != 45) {
-            event.preventdefault();
-            return false;
-        }
-    });
-});
-
+window.successfullymodal = successfullymodal;
+window.failedmodal = failedmodal;
+window.loadingbutton = loadingbutton;
+window.unsetloadingbutton = unsetloadingbutton;
+window.redirect = redirect;
+window.numberformat = numberformat;
+window.isemail = isemail;

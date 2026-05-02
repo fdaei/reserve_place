@@ -19,9 +19,6 @@ class Message extends Component
     public $ticket;
     public $userPhone;
     public function mount(){
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
         $this->ticket=Ticket::find($this->id);
         $this->area=$this->ticket->area;
         $this->userPhone=User::find($this->ticket->user_id)->phone;

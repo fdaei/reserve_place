@@ -28,6 +28,23 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        RateLimiter::for('admin-auth', function (Request $request) {
+            $identity = $request->input('phone') ?: $request->ip();
+
+            return Limit::perMinute(5)->by($identity)->response(function () {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->withErrors([
+                        'phone' => 'تعداد تلاش‌های ورود بیش از حد مجاز است. لطفا چند دقیقه دیگر دوباره تلاش کنید.',
+                    ]);
+            });
+        });
+
+        RateLimiter::for('admin-sensitive', function (Request $request) {
+            return Limit::perMinute(30)->by($request->user()?->id ?: $request->ip());
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

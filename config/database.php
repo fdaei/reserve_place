@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Str;
 
+$mysqlSslCaOption = defined('Pdo\Mysql::ATTR_SSL_CA')
+    ? constant('Pdo\Mysql::ATTR_SSL_CA')
+    : PDO::MYSQL_ATTR_SSL_CA;
+
 return [
 
     /*
@@ -54,12 +58,12 @@ return [
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => env('DB_PREFIX', ''),
+            'prefix' => env('DB_PREFIX', 'vil_'),
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                $mysqlSslCaOption => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 

@@ -8,11 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Page extends Model
 {
     use HasFactory;
-    protected $fillable=[
-        "url_text",
-        "title",
-        "text",
-        "status",
-        "visit_count",
+
+    protected $fillable = [
+        'category_id',
+        'url_text',
+        'title',
+        'text',
+        'status',
+        'visit_count',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(PageCategory::class, 'category_id');
+    }
 }

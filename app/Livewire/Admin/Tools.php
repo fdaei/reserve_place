@@ -111,9 +111,6 @@ class Tools extends Component
     public $type="residence";
     public function mount($type="residence")
     {
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
         $this->type=$type;
     }
 }

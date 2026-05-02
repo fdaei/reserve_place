@@ -28,7 +28,7 @@ class Index extends Component
 
         $this->provinces=Province::where("is_use",true)->where("country_id",1)->get()->keyBy("id");
         $this->cities=City::where("is_use",true)->get()->keyBy("id");
-        $query = \App\Models\Tour::query();
+        $query = \App\Models\Tour::query()->where("status", 1);
         if ($this->a != 0) {
             $query->orderBy("amount", $this->a == 1 ? "ASC" : "DESC");
         } else {

@@ -222,13 +222,13 @@ class Add extends Component
             "start_date" => $this->startDateValidation,
             "travel_version"=>$this->travelVersion,
             "image"=>$this->mainImage,
-            "status" => true,
         ];
         $model = null;
         $oldImages = [];
         if ($this->id==null){
+            $data["status"] = 0;
             $model = Friend::create($data);
-            session()->put('message', "درخواست همسفر با موفقیت ثبت شد");
+            session()->put('message', "درخواست همسفر ثبت شد و پس از تایید در سایت نمایش داده می‌شود");
         }else{
             $model = Friend::where('id', $this->id)
                 ->where('user_id', auth()->id())
@@ -241,6 +241,7 @@ class Add extends Component
             }
 
             $oldImages = $model->images()->pluck('url')->toArray();
+            $data["status"] = $model->status;
             $model->update($data);
             Images::where("friend_id", $this->id)->delete();
             OptionValue::where("friend_id",$this->id)->delete();

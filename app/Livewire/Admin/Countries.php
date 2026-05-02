@@ -2,100 +2,144 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\City;
 use App\Models\Country;
 use App\Models\Province;
-use App\Models\Residence;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class Countries extends Component
 {
-
-    use WithPagination;
-    public $search="";
-    public $cId;
+    public $search = '';
+    public $form = 'empty';
+    public $id;
+    public $name;
 
     public function render()
     {
+        $search = trim($this->search);
+        $matchedCountryIds = collect();
+        $matchedProvinceIds = collect();
 
-        $query = \App\Models\Country::query();
+        if ($search !== '') {
+            $matchedCountryIds = Country::query()
+                ->where('name', 'like', '%' . $search . '%')
+                ->pluck('id');
 
-        if (!empty($this->search)) {
-            $query->where('name', 'like', '%' . $this->search . '%');
+            $matchedProvinceIds = Province::query()
+                ->where('name', 'like', '%' . $search . '%')
+                ->pluck('id');
+
+            $matchedProvinceIdsFromCities = City::query()
+                ->where('name', 'like', '%' . $search . '%')
+                ->pluck('province_id');
+
+            $matchedProvinceIds = $matchedProvinceIds
+                ->merge($matchedProvinceIdsFromCities)
+                ->filter()
+                ->unique()
+                ->values();
+
+            $matchedCountryIds = $matchedCountryIds
+                ->merge(
+                    Province::query()
+                        ->whereIn('id', $matchedProvinceIds)
+                        ->pluck('country_id')
+                )
+                ->filter()
+                ->unique()
+                ->values();
         }
 
-        $list = $query->orderBy('id', 'DESC')->paginate(10);
-        $collection = $list->getCollection()->keyBy('id');
-        $villas = Residence::all();
-
-        foreach ($villas as $villa) {
-            if (isset($collection[$villa->city_id])) {
-                $collection[$villa->city_id]['residence_count'] = ($collection[$villa->city_id]['residence_count'] ?? 0) + 1;
-            }
+        $countriesQuery = Country::query();
+        if ($search !== '') {
+            $countriesQuery->whereIn('id', $matchedCountryIds);
         }
 
-        $list->setCollection($collection);
+        $countries = $countriesQuery->orderBy('name')->get();
+        $countryIds = $countries->pluck('id');
 
-        return view('livewire.admin.countries',[
-            "list" => $list
+        $allProvinces = Province::query()
+            ->whereIn('country_id', $countryIds)
+            ->orderBy('name')
+            ->get()
+            ->groupBy('country_id');
+
+        $matchedProvinces = Province::query()
+            ->whereIn('country_id', $countryIds)
+            ->when($search !== '', fn ($query) => $query->whereIn('id', $matchedProvinceIds))
+            ->orderBy('name')
+            ->get()
+            ->groupBy('country_id');
+
+        $tree = $countries->map(function (Country $country) use ($search, $matchedCountryIds, $allProvinces, $matchedProvinces) {
+            $provinces = $search !== '' && !$matchedCountryIds->contains($country->id)
+                ? ($matchedProvinces->get($country->id) ?? collect())
+                : ($allProvinces->get($country->id) ?? collect());
+
+            return [
+                'country' => $country,
+                'provinces' => $provinces,
+            ];
+        });
+
+        return view('livewire.admin.countries', [
+            'tree' => $tree,
         ])
-            ->extends("app")
-            ->section("content");
+            ->extends('app')
+            ->section('content');
     }
-    public function updated($propertyName)
+
+    protected $listeners = ['remove'];
+
+    public function remove($id)
     {
-        $this->resetPage();
+        Country::findOrFail($id)->delete();
+        $this->dispatch('removed');
     }
 
+    public function setForm($form, $id = null)
+    {
+        $this->form = $form;
 
-    protected $listeners = ["remove"];
-    public $form="empty";
-    public $id,$name;
-
-    public function remove($id){
-        $user=Country::find($id);
-        $user->delete();
-        $this->dispatch("removed");
-    }
-
-    public function setForm($form,$id=null){
-        $this->form=$form;
-        if ($form=="edit"){
-            $model=Country::find($id);
-            $this->form="edit";
-            $this->id=$id;
-            $this->name=$model->name;
-        }elseif ($form=="empty"){
-            $this->id=null;
-            $this->name=null;
+        if ($form === 'edit') {
+            $model = Country::findOrFail($id);
+            $this->id = $id;
+            $this->name = $model->name;
+            return;
         }
+
+        $this->id = null;
+        $this->name = '';
     }
-    public function add(){
-        $this->form="empty";
+
+    public function add()
+    {
+        $this->validate([
+            'name' => 'required|string|min:2|max:80',
+        ]);
+
         Country::create([
-            "name"=>$this->name,
-            "is_use"=>false
+            'name' => trim($this->name),
         ]);
-        $this->setForm("empty");
-        $this->form="empty";
-        $this->dispatch("create");
+
+        $this->setForm('empty');
+        $this->dispatch('create');
     }
-    public function edit(){
-        Country::find($this->id)->update([
-            "name"=>$this->name,
-        ]);
-        $this->setForm("empty");
-        $this->form="empty";
-        $this->dispatch("edited");
-    }
-    public function mount()
+
+    public function edit()
     {
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
+        $this->validate([
+            'name' => 'required|string|min:2|max:80',
+        ]);
+
+        Country::findOrFail($this->id)->update([
+            'name' => trim($this->name),
+        ]);
+
+        $this->setForm('empty');
+        $this->dispatch('edited');
     }
+
+
 }
-
-
-

@@ -1,169 +1,145 @@
-<div class="section">
-    <h2 wire:ignore>
-        <i class="fas fa-users-cog"></i>
-        مدیریت اقامتگاه ها
-    </h2>
-    <div class="" id="collapseExample">
-        <div class="card card-body">
+<div class="section listing-panel">
+    <div class="listing-panel-head">
+        <h2 class="listing-panel-title">
+            <span class="listing-panel-icon">
+                <i class="fa fa-building"></i>
+            </span>
+            مدیریت اقامتگاه‌ها
+        </h2>
+    </div>
 
-            <div class="row flex-nowrap flex-row justify-content-between">
-                <div style="margin: 4px">
-                    <label>نام:
-                        <input type="text" wire:model.live="search"  class="form-control">
-                    </label>
-                </div>
-                <div>
+    @if(session('admin_success'))
+        <div class="admin-notice success">{{ session('admin_success') }}</div>
+    @endif
+
+    <div class="listing-toolbar">
+        <div class="listing-toolbar-main">
+            <input
+                type="text"
+                class="listing-search"
+                wire:model.live.debounce.300ms="search"
+                placeholder="جستجوی عنوان"
+            >
+
+            <select wire:model.live="city">
+                <option value="0">همه شهرها</option>
+                @foreach($cities as $cityItem)
+                    <option value="{{ $cityItem->id }}">{{ $cityItem->name }}</option>
+                @endforeach
+            </select>
+
+            <select wire:model.live="incomeModel">
+                <option value="all">مدل درآمدی</option>
+                <option value="paid">دلاری</option>
+                <option value="free">رایگان</option>
+            </select>
+
+            <select wire:model.live="status">
+                <option value="all">وضعیت</option>
+                <option value="active">فعال</option>
+                <option value="pending">در انتظار</option>
+            </select>
+        </div>
+
+        <div class="listing-toolbar-actions">
+            <select class="listing-sort-select" wire:model.live="sort" aria-label="مرتب‌سازی">
+                <option value="latest">جدید</option>
+                <option value="oldest">قدیم</option>
+                <option value="cheap">ارزان</option>
+                <option value="expensive">گران</option>
+                <option value="popular">پربازدید</option>
+            </select>
+
+            <button type="button" class="toolbar-btn toolbar-btn--dark" wire:click="$refresh">فیلتر</button>
+            <a href="{{ url('add-residence') }}" class="toolbar-btn toolbar-btn--success">
+                <span>+</span>
+                جدید
+            </a>
+        </div>
+    </div>
+
+    @if($list->count() > 0)
+        <div class="listing-table-wrap">
+            <table class="table responsive-table listing-table">
+                <thead>
+                <tr>
+                    <th>عنوان</th>
+                    <th>میزبان</th>
+                    <th>شهر</th>
+                    <th>مدل درآمدی</th>
+                    <th>شماره تماس</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($list as $item)
+                    @php
+                        $hostName = trim(($item->admin->name ?? '') . ' ' . ($item->admin->family ?? ''));
+                        $incomeLabel = (int) $item->vip === 1 ? 'دلاری' : 'رایگان';
+                        $incomeClass = (int) $item->vip === 1 ? 'listing-badge--income-paid' : 'listing-badge--income-free';
+                    @endphp
+                    <tr>
+                        <td data-label="عنوان">
+                            <strong class="listing-title">{{ $item->title }}</strong>
+                        </td>
+                        <td data-label="میزبان">
+                            <strong>{{ $hostName !== '' ? $hostName : 'بدون نام' }}</strong>
+                        </td>
+                        <td data-label="شهر">
+                            {{ $item->city->name ?? '-' }}
+                        </td>
+                        <td data-label="مدل درآمدی">
+                            <span class="listing-badge {{ $incomeClass }}">{{ $incomeLabel }}</span>
+                        </td>
+                        <td data-label="شماره تماس">
+                            <span class="listing-phone">{{ convertEnglishToPersianNumbers($item->admin->phone ?? 'شماره سایت') }}</span>
+                        </td>
+                        <td data-label="وضعیت">
+                            <span class="status-chip {{ $item->status ? 'active' : 'pending' }}">
+                                {{ $item->status ? 'فعال' : 'در انتظار' }}
+                            </span>
+                        </td>
+                        <td data-label="عملیات">
+                            <div class="listing-actions">
+                                @if(!$item->status)
+                                    <button type="button" class="listing-icon-btn listing-icon-btn--success" wire:click="approve({{ $item->id }})" aria-label="تایید">
+                                        <i class="fa fa-check-square"></i>
+                                    </button>
+                                @endif
+
+                                <button type="button" class="listing-icon-btn" wire:click="edit({{ $item->id }})" aria-label="ویرایش">
+                                    <i class="fa fa-pencil-square-o"></i>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="listing-icon-btn listing-icon-btn--danger"
+                                    wire:click="remove({{ $item->id }})"
+                                    wire:confirm="از حذف اقامتگاه {{ $item->title }} اطمینان دارید؟"
+                                    aria-label="حذف"
+                                >
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <div class="listing-pagination">
+            <div class="card">
+                <div class="card-body">
+                    {{ $list->links('vendor.pagination.default') }}
                 </div>
             </div>
         </div>
-    </div>
-
-    <table class="data-table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>نام</th>
-            <th>قیمت</th>
-            <th>امتیاز</th>
-            <th>
-                تماس ها
-            </th>
-            <th>مکان</th>
-            <th>تاریخ ثبت</th>
-            <th>عملیات</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach($list as $item)
-
-            <tr>
-                <td>{{$item->id}}</td>
-                <td>{{$item->title}}</td>
-                <td>{{number_format($item->amount)}}</td>
-                <td>
-                    <i class="text-warning fa fa-star"></i>
-                    {{$item->point}}
-                </td>
-                <td>
-                    {{$item->calls}}
-                </td>
-{{--                <td>@php echo $item->status?'<i class="badge badge-success">فعال</i>':'<i class="badge badge-danger">غیرفعال</i>'@endphp</td>--}}
-                <td>{{$provinces[$item->province_id]->name}}/{{$cities[$item->city_id]->name}}</td>
-                @php
-                    $gregorianDate = new \DateTime($item["created_at"]);
-                    $jalaliDate = \Morilog\Jalali\Jalalian::fromDateTime($gregorianDate);
-                @endphp
-                <td>
-                    {{$jalaliDate->format('%Y/%m/%d')}}
-                    <br>
-                    <span class="op-5">
-                            {{$jalaliDate->format('H:i')}}
-                            </span>
-                </td>
-                <td>
-                    <button class="btn btn-sm btn-warning" wire:click="setForm('edit','{{$item->id}}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger" data-id="{{$item->id}}" data-title="{{$item->title}}">
-                        <i class="fas fa-trash" ></i>
-                    </button>
-                </td>
-            </tr>
-                @endforeach
-        </tbody>
-    </table>
-
-    <div class="card">
-        <div class="card-body">
-            {{$list->links('vendor.pagination.default')}}
+    @else
+        <div class="admin-empty-state">
+            <h4>اقامتگاهی پیدا نشد</h4>
+            <p>فیلترها را تغییر دهید یا جستجو را پاک کنید.</p>
         </div>
-    </div>
-  <div class="modal fade {{$form!="empty"?"show":""}}" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="{{$form!="empty"?"display: block;":""}}">
-                    <div class="modal-dialog">
-                        <form wire:submit="{{$form}}" class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">
-                                    @if($form=="add")
-                                        افزودن
-                                    @else
-                                        ویرایش
-                                    @endif
-                                </h5>
-                                <span  wire:click="setForm('empty')" type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </span>
-                            </div>
-                            <div class="modal-body">
-                                <div style="margin: 4px">
-                                    <label>نام:
-                                        <input type="text" wire:model="name"  class="form-control">
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <span wire:click="setForm('empty')" type="button" class="btn btn-secondary" data-dismiss="modal">لغو</span>
-                                <button  class="btn btn-primary">ذخیره</button>
-                            </div>
-                        </form>
-                    </div>
-  </div>
-
-        @script
-        <script>
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer)
-                    toast.addEventListener('mouseleave', Swal.resumeTimer)
-                }
-            })
-            $(document).on("click", ".btn-danger", function () {
-                let id=$(this).attr("data-id")
-                let title=$(this).attr("data-title")
-                Swal.fire({
-                    icon: "warning",
-                    title: 'هشدار',
-                    text: `از حذف کردن  ${title} اطمینان دارید؟`,
-                    confirmButtonText: "لغو",
-                    denyButtonText: "حذف کردن",
-                    showDenyButton: true,
-                    background: '#333',
-                    color: '#fff',
-                    confirmButtonColor: '#3085d6',
-                }).then(res => {
-                    if (res.isDenied) {
-                        Livewire.dispatch("remove", { id: id });
-                        Livewire.on('componentName', (data) => {
-                            console.log(data.name); // خروجی: blog-component
-                        });
-                    }
-                })
-            });
-
-            Livewire.on("edited", event => {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'اطلاعات با موفقیت بروز شد'
-                })
-            })
-            Livewire.on("create", event => {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'اطلاعات موفقیت ثبت شد'
-                })
-            })
-
-            Livewire.on("removed", event => {
-                Toast.fire({
-                    icon: 'success',
-                    title: 'سطر با موفقیت حذف شد'
-                })
-            })
-        </script>
-        @endscript
-
+    @endif
 </div>

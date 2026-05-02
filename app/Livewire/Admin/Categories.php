@@ -4,99 +4,108 @@ namespace App\Livewire\Admin;
 
 use App\Models\Option;
 use App\Models\OptionCategory;
-use App\Models\Province;
-use App\Models\Residence;
-use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 class Categories extends Component
 {
+    public $search = '';
 
-    use WithPagination;
-    public $search="";
-    public $type="residence";
+    public $type = 'residence';
 
+    public $form = 'empty';
+
+    public $id;
+
+    public $title;
 
     public function render()
     {
-
-        $query = \App\Models\OptionCategory::query();
-        $query->where("type",$this->type);
-
-        if (!empty($this->search)) {
-            $query->where('title', 'like', '%' . $this->search . '%');
+        $query = OptionCategory::query()->where('type', $this->type);
+        if (! empty($this->search)) {
+            $query->where('title', 'like', '%'.$this->search.'%');
         }
 
-        $list = $query->orderBy('id', 'DESC')->paginate(10);
-        $collection = $list->getCollection()->keyBy('id');
-        $options = Option::where("type",$this->type)->get();
+        $counts = Option::query()
+            ->where('type', $this->type)
+            ->selectRaw('option_category_id, COUNT(*) as aggregate')
+            ->groupBy('option_category_id')
+            ->pluck('aggregate', 'option_category_id');
 
-        foreach ($options as $option) {
-            if (isset($collection[$option->option_category_id])) {
-                $collection[$option->option_category_id]['option_count'] = ($collection[$option->option_category_id]['option_count'] ?? 0) + 1;
-            }
-        }
+        $list = $query->orderBy('title')->get()->map(function (OptionCategory $category) use ($counts) {
+            $category->option_count = $counts->get($category->id, 0);
 
-        $list->setCollection($collection);
+            return $category;
+        });
 
-        return view('livewire.admin.categories',[
-            "list" => $list
+        return view('livewire.admin.categories', [
+            'list' => $list,
+            'typeLabel' => $this->getTypeLabel(),
         ])
-            ->extends("app")
-            ->section("content");
+            ->extends('app')
+            ->section('content');
     }
-    public function updated($propertyName)
+
+    protected $listeners = ['remove'];
+
+    public function remove($id)
     {
-        $this->resetPage();
+        OptionCategory::findOrFail($id)->delete();
+        $this->dispatch('removed');
     }
 
+    public function setForm($form, $id = null)
+    {
+        $this->form = $form;
 
-    protected $listeners = ["remove"];
-    public $form="empty";
-    public $id,$title;
+        if ($form === 'edit') {
+            $model = OptionCategory::findOrFail($id);
+            $this->id = $id;
+            $this->title = $model->title;
 
-    public function remove($id){
-        $user=OptionCategory::find($id);
-        $user->delete();
-        $this->dispatch("removed");
-    }
-
-    public function setForm($form,$id=null){
-        $this->form=$form;
-        if ($form=="edit"){
-            $model=OptionCategory::find($id);
-            $this->form="edit";
-            $this->id=$id;
-            $this->title=$model->title;
-        }elseif ($form=="empty"){
-            $this->id=null;
-            $this->title=null;
+            return;
         }
+
+        $this->id = null;
+        $this->title = '';
     }
-    public function add(){
-        $this->form="empty";
+
+    public function add()
+    {
+        $this->validate([
+            'title' => 'required|string|min:2|max:80',
+        ]);
+
         OptionCategory::create([
-            "title"=>$this->title,
-            "type"=>$this->type,
+            'title' => trim($this->title),
+            'type' => $this->type,
         ]);
-        $this->setForm("empty");
-        $this->dispatch("create");
-    }
-    public function edit(){
-        OptionCategory::find($this->id)->update([
-            "title"=>$this->title,
-            "type"=>$this->type,
-        ]);
-        $this->setForm("empty");
-        $this->dispatch("edited");
-    }
-    public function mount($type="residence")
-    {
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
-        $this->type=$type;
+
+        $this->setForm('empty');
+        $this->dispatch('create');
     }
 
+    public function edit()
+    {
+        $this->validate([
+            'title' => 'required|string|min:2|max:80',
+        ]);
+
+        OptionCategory::findOrFail($this->id)->update([
+            'title' => trim($this->title),
+            'type' => $this->type,
+        ]);
+
+        $this->setForm('empty');
+        $this->dispatch('edited');
+    }
+
+    public function mount($type = 'residence')
+    {
+        $this->type = $type;
+    }
+
+    protected function getTypeLabel(): string
+    {
+        return config('entity-types.option_types.'.$this->type, config('entity-types.option_types.residence'));
+    }
 }

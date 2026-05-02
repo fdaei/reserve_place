@@ -11,8 +11,9 @@ function convertEnglishToPersianNumbers($string) {
 function convertPersianToEnglishNumbers($string) {
     $englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     $persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+    $arabicNumbers = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
 
-    return str_replace( $persianNumbers,$englishNumbers, $string);
+    return str_replace($arabicNumbers, $englishNumbers, str_replace($persianNumbers, $englishNumbers, $string));
 }
 
 

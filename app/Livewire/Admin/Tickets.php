@@ -18,9 +18,6 @@ class Tickets extends Component
     public $search="";
 
     public function mount(){
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
     }
 
     public function render()

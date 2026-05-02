@@ -17,8 +17,28 @@ class Detail extends Component
 
     public $point;
 
+    public $commentBody = '';
+
+    private function findVisibleStore()
+    {
+        if (auth()->check() && auth()->user()->canManageContent()) {
+            return FoodStore::find($this->id);
+        }
+
+        return FoodStore::query()
+            ->where('id', $this->id)
+            ->where(function ($query) {
+                $query->where('status', 1);
+
+                if (auth()->check()) {
+                    $query->orWhere('user_id', auth()->id());
+                }
+            })
+            ->first();
+    }
+
     public function mount(){
-        $this->model=FoodStore::find($this->id);
+        $this->model = $this->findVisibleStore();
         if (!$this->model){
             abort(404);
         }
@@ -27,13 +47,24 @@ class Detail extends Component
         view()->share('title', $this->model->title);
     }
     public function render(){
-        $this->model=FoodStore::find($this->id);
+        $this->model = $this->findVisibleStore();
+        if (!$this->model){
+            abort(404);
+        }
         return view('livewire.user.food-store.detail')
             ->extends("app")
             ->section("content");
     }
 
     public function submitPoint(){
+        $this->validate([
+            'point' => ['required', 'integer', 'between:1,5'],
+            'commentBody' => ['required', 'string', 'max:1000'],
+        ], [], [
+            'point' => 'امتیاز',
+            'commentBody' => 'متن نظر',
+        ]);
+
         $totalSum=$this->point;
         foreach ($this->model->comments as $comment){
             $totalSum=$totalSum+$comment->point;
@@ -48,6 +79,8 @@ class Detail extends Component
             "user_id"=>auth()->user()->id,
             "store_id"=>$this->model->id,
             "point"=>$this->point,
+            "body"=>$this->commentBody,
+            "status"=>"approved",
         ]);
         session()->put('comment', "امتیاز شما با موفقیت ثبت شد.");
     }

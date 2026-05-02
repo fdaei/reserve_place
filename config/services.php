@@ -31,4 +31,13 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'null'),
+        'base_url' => env('SMS_BASE_URL'),
+        'username' => env('SMS_USERNAME'),
+        'password' => env('SMS_PASSWORD'),
+        'api_key' => env('SMS_API_KEY'),
+        'sender' => env('SMS_SENDER'),
+    ],
+
 ];

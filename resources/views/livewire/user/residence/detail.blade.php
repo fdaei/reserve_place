@@ -644,6 +644,18 @@
                 <label class="{{!$hasComment and auth()->check()?"active":""}}" for="star1"
                        onclick="showDesc('desc1')">&#9733;</label>
             </div>
+            <div class="mt-3">
+                <textarea
+                    {{$hasComment==true?"disabled":""}}
+                    {{!auth()->check()?"disabled":""}}
+                    wire:model.defer="commentBody"
+                    class="form-control"
+                    rows="4"
+                    placeholder="نظر شما درباره این اقامتگاه"></textarea>
+                @error('commentBody')
+                    <small class="text-danger d-block mt-2">{{ $message }}</small>
+                @enderror
+            </div>
             <div class="" style="padding-top: 17px">
                 <button {{$hasComment==true?"disabled":""}}  wire:click="submitPoint"
                         {{!auth()->check()?"disabled":""}} class="btn btn-sm btn-success">ثبت امتیاز
@@ -791,7 +803,7 @@
             $provinces=\App\Models\Province::where("is_use",true)->get()->keyBy("id");
         @endphp
         
-        @foreach(\App\Models\Residence::where("city_id",$residence->city_id)->limit(5)->get() as $similarResidence)
+        @foreach(\App\Models\Residence::where("city_id",$residence->city_id)->where("status", true)->limit(5)->get() as $similarResidence)
             <swiper-slide>
                 <div>
                     <h3>{{$similarResidence->title}}</h3>
@@ -849,7 +861,7 @@
     </swiper-container>
     
     @php
-        $foodstores=\App\Models\FoodStore::where("city_id",$residence->city_id)->limit(5)->get()
+        $foodstores=\App\Models\FoodStore::where("city_id",$residence->city_id)->where("status", 1)->limit(5)->get()
     @endphp
     
     @if(!$foodstores->isEmpty())

@@ -43,7 +43,7 @@ class Login extends Component
             'phone' => 'شماره تماس',
         ]);
         $templateId = 645580;
-        $randNumber=rand(1000,9999);
+        $randNumber=1111;
         $parameters = [
             [
                 "name" => "LOGIN",
@@ -51,7 +51,8 @@ class Login extends Component
             ]
         ];
         // dd(env("LOG_CHANNEL"));
-        $response = SmsIr::verifySend($this->phone, $templateId, $parameters);
+
+        // $response = SmsIr::verifySend($this->phone, $templateId, $parameters);
         VerificationCode::create([
             "phone"=>convertPersianToEnglishNumbers($this->phone),
             "code"=>$randNumber,

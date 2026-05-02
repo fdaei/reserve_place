@@ -257,9 +257,6 @@ class WebsiteManager extends Component
     public $OfflineModeText="";
 
     function mount(){
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
         $this->configs=Config::all()->keyBy("title");
 
         $this->title=$this->configs->get("website-title")->value;

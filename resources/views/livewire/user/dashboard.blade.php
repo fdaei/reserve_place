@@ -153,6 +153,11 @@
                         <li>
                             <div>
                                 <h3>{{$item->title}}</h3>
+                                <div class="px-2 pb-2">
+                                    <span class="badge {{$item->status == 1 ? 'badge-success' : ($item->status == 2 ? 'badge-danger' : 'badge-warning')}}">
+                                        {{$item->status == 1 ? 'فعال' : ($item->status == 2 ? 'رد شده' : 'در انتظار تایید')}}
+                                    </span>
+                                </div>
                                 <span class="line"></span>
                                 <div class="image-container">
                                     <img src="{{asset("storage/residences/".$item->image)}}">
@@ -205,6 +210,11 @@
                         <li>
                             <div>
                                 <h3>{{$item->title}}</h3>
+                                <div class="px-2 pb-2">
+                                    <span class="badge {{$item->status == 1 ? 'badge-success' : ($item->status == 2 ? 'badge-danger' : 'badge-warning')}}">
+                                        {{$item->status == 1 ? 'فعال' : ($item->status == 2 ? 'رد شده' : 'در انتظار تایید')}}
+                                    </span>
+                                </div>
                                 <span class="line"></span>
                                 <div class="image-container">
                                     <img src="{{asset("storage/tours/".$item->image)}}">
@@ -256,6 +266,11 @@
                         <li>
                             <div>
                                 <h3>{{$item->title}}</h3>
+                                <div class="px-2 pb-2">
+                                    <span class="badge {{$item->status == 1 ? 'badge-success' : ($item->status == 2 ? 'badge-danger' : 'badge-warning')}}">
+                                        {{$item->status == 1 ? 'فعال' : ($item->status == 2 ? 'رد شده' : 'در انتظار تایید')}}
+                                    </span>
+                                </div>
                                 <span class="line"></span>
                                 <div class="image-container">
                                     <img src="{{asset("storage/food_store/".$item->image)}}">
@@ -308,6 +323,11 @@
                         <li>
                             <div>
                                 <h3>{{$item->title}}</h3>
+                                <div class="px-2 pb-2">
+                                    <span class="badge {{$item->status == 1 ? 'badge-success' : ($item->status == 2 ? 'badge-danger' : 'badge-warning')}}">
+                                        {{$item->status == 1 ? 'فعال' : ($item->status == 2 ? 'رد شده' : 'در انتظار تایید')}}
+                                    </span>
+                                </div>
                                 <span class="line"></span>
                                 <div class="image-container">
                                     <img src="{{asset("storage/friends/".$item->image)}}">
@@ -457,7 +477,7 @@
             swiper-slide:nth-child(3n) {
             }
         </style>
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js" onerror="this.onerror=null;this.src='{{ asset(\"/plugin/swiper-slider/swiper-element-bundle.min.js\") }}';"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js" onerror="this.onerror=null;this.src='{{ asset('/plugin/swiper-slider/swiper-element-bundle.min.js') }}';"></script>
     </div>
     <div class="col-12 "></div>
     <div class="col-12 "></div>

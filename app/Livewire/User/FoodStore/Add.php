@@ -202,13 +202,13 @@ class Add extends Component
             "lat" => $this->latLen[0],
             "lng" => $this->latLen[1],
             "image" => $this->mainImage,
-            "status" => true,
         ];
         $residence = null;
         $oldImages = [];
         if ($this->id==null){
+            $data["status"] = 0;
             $residence = FoodStore::create($data);
-            session()->put('message', "اقامتگاه با موفقیت ثبت شد");
+            session()->put('message', "رستوران ثبت شد و پس از تایید در سایت نمایش داده می‌شود");
         }else{
             $residence = FoodStore::where('id', $this->id)
                 ->where('user_id', auth()->id())
@@ -221,6 +221,7 @@ class Add extends Component
             }
 
             $oldImages = $residence->images()->pluck('url')->toArray();
+            $data["status"] = $residence->status;
             $residence->update($data);
             Images::where("store_id", $this->id)->delete();
             OptionValue::where("foodstore_id",$this->id)->delete();
@@ -232,7 +233,7 @@ class Add extends Component
                 }
             }
 
-            session()->put('message', "اقامتگاه با موفقیت ویرایش شد");
+            session()->put('message', "رستوران با موفقیت ویرایش شد");
         }
         foreach ($this->gallery as $item) {
             Images::create([
@@ -247,6 +248,8 @@ class Add extends Component
                 "value" => true,
             ]);
         }
+
+        auth()->user()?->assignHostRole();
 
         Redirect::to("/dashboard");
     }

@@ -15,6 +15,17 @@ class Ticket extends Model
         "status",
         "user_id"
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function chats()
+    {
+        return $this->hasMany(TicketChat::class);
+    }
+
     public function scopeSearch(Builder $query, $searchText){
         return $query
             ->orWhere('title', 'like', '%' . $searchText . '%')

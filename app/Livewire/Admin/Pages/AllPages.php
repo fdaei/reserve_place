@@ -2,11 +2,7 @@
 
 namespace App\Livewire\Admin\Pages;
 
-use App\Models\Province;
-use App\Models\Residence;
-use App\Models\Ticket;
-use App\Models\TicketChat;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Page;
 use Livewire\Component;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\WithPagination;
@@ -14,73 +10,43 @@ use Livewire\WithPagination;
 class AllPages extends Component
 {
     use WithPagination;
-    public $search="";
+    public $search = '';
+    protected $listeners = ['remove'];
 
-    public function mount(){
-        if (!auth()->check() || auth()->user()->phone !== '09123002501') {
-            return Redirect::to("");
-        }
-    }
+
 
     public function render()
     {
-
-        $query = \App\Models\Page::query();
+        $query = Page::query();
 
         if (!empty($this->search)) {
-            $query->where('title', 'like', '%' . $this->search . '%');
+            $query->where(function ($builder) {
+                $builder->where('title', 'like', '%' . $this->search . '%')
+                    ->orWhere('url_text', 'like', '%' . $this->search . '%');
+            });
         }
 
         $list = $query->orderBy('id', 'DESC')->paginate(10);
-        return view('livewire.admin.pages.all-pages',[
-            "list" => $list
+        return view('livewire.admin.pages.all-pages', [
+            'list' => $list,
         ])
-            ->extends("app")
-            ->section("content");
+            ->extends('app')
+            ->section('content');
     }
-    public function updated($propertyName)
+
+    public function updatedSearch()
     {
         $this->resetPage();
     }
 
-
-    protected $listeners = ["remove"];
-    public $form="empty";
-    public $area;
-    public $title;
-    public $phone;
-
-    public function remove($id){
-        $ticket=Ticket::find($id);
-        $ticket=TicketChat::where("ticket_id",$id)->delete();
-        $ticket->delete();
-        $this->dispatch("removed");
-    }
-
-    public function setForm($form,$id=null){
-        $this->form=$form;
-        if ($form=="edit"){
-            $ticket=Ticket::find($id);
-            $this->area=$ticket->area;
-            $this->phone=$ticket->phone;
-        }elseif ($form=="empty"){
-            $this->id=null;
-            $this->name=null;
+    public function remove($id)
+    {
+        $page = Page::find($id);
+        if (!$page) {
+            return;
         }
-    }
-    public function add(){
-        $this->form="empty";
-        Province::create([
-            "name"=>$this->name,
-            "is_use"=>false
-        ]);
-        $this->setForm("empty");
-        $this->dispatch("create");
-    }
-    public function edit(){
-        Auth::logout();
-        $user = \App\Models\User::find(Residence::find($this->id)->user_id);
-        Auth::login($user);
-        return redirect('/edit-residence/'.$this->id);
+
+        $page->delete();
+        $this->dispatch('removed');
     }
 }

@@ -17,7 +17,7 @@ return [
         'string' => ':attribute باید بین :min و :max کاراکتر باشد.',
         'array' => ':attribute باید بین :min و :max مورد داشته باشد.',
     ],
-    'boolean' => ':attribute فقط می‌تواند true یا false باشد.',
+    'boolean' => ':attribute باید بله یا خیر باشد.',
     'confirmed' => 'تایید :attribute مطابقت ندارد.',
     'date' => ':attribute یک تاریخ معتبر نیست.',
     'date_equals' => ':attribute باید تاریخ مساوی با :date باشد.',

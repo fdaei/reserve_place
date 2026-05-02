@@ -178,13 +178,13 @@ class AddResidence extends Component
             "image" => $this->mainImage,
             "lat" => $this->latLen[0],
             "lng" => $this->latLen[1],
-            "status" => true,
         ];
         $residence = null;
         $oldImages = [];
         if ($this->id==null){
+            $data["status"] = false;
             $residence = Residence::create($data);
-            session()->put('message', "اقامتگاه با موفقیت ثبت شد");
+            session()->put('message', "اقامتگاه ثبت شد و پس از تایید در سایت نمایش داده می‌شود");
         }else{
             $residence = Residence::where('id', $this->id)
                 ->where('user_id', auth()->id())
@@ -197,6 +197,7 @@ class AddResidence extends Component
             }
 
             $oldImages = $residence->images()->pluck('url')->toArray();
+            $data["status"] = $residence->status;
             $residence->update($data);
             Images::where("residence_id", $this->id)->delete();
             OptionValue::where("residence_id",$this->id)->delete();
@@ -223,6 +224,8 @@ class AddResidence extends Component
                 "value" => true,
             ]);
         }
+
+        auth()->user()?->assignHostRole();
 
         Redirect::to("/dashboard");
     }
