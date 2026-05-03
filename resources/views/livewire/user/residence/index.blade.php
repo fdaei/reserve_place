@@ -1,567 +1,793 @@
 <div>
-    @vite(['resources/css/user/index.less'])
-    @php
-        // Schema اصلی برای صفحه لیست اقامتگاه‌ها
-        $schemaData = [
-            "@context" => "https://schema.org",
-            "@type" => "ItemList",
-            "name" => "لیست اقامتگاه‌های ایران - اجاره ویلا، سوئیت، آپارتمان و کلبه",
-            "description" => getConfigs("website-description"),
-            "url" => url()->current(),
-            "numberOfItems" => $residences->count(),
-            "itemListElement" => $residences->map(function ($residence, $index) use ($provinces, $cities) {
-                $provinceName = $provinces[$residence->province_id]->name ?? 'نامشخص';
-                $cityName = $cities[$residence->city_id]->name ?? 'نامشخص';
-                
-                // نوع اقامتگاه
-                $residenceType = \App\Models\Residence::getResidenceType()[$residence->residence_type] ?? 'اقامتگاه';
-                $areaType = \App\Models\Residence::getAreaType()[$residence->area_type] ?? '';
-                
-                return [
-                    "@type" => "ListItem",
-                    "position" => $index + 1,
-                    "item" => [
-                        "@type" => "VacationRental",
-                        "name" => $residence->title,
-                        "description" => "{$residenceType} {$areaType} در {$cityName}، {$provinceName} با {$residence->room_number} اتاق و ظرفیت {$residence->people_number} نفر",
-                        "image" => url("storage/residences/{$residence->image}"),
-                        "url" => url("detail/{$residence->id}"),
-                        "address" => [
-                            "@type" => "PostalAddress",
-                            "addressLocality" => $cityName,
-                            "addressRegion" => $provinceName,
-                            "addressCountry" => "IR"
-                        ],
-                        "numberOfRooms" => (int)$residence->room_number,
-                        "occupancy" => [
-                            "@type" => "QuantitativeValue",
-                            "maxValue" => (int)$residence->people_number
-                        ],
-                        "floorSize" => [
-                            "@type" => "QuantitativeValue",
-                            "value" => (int)$residence->area,
-                            "unitCode" => "MTK"
-                        ],
-                        "priceRange" => number_format($residence->amount) . " تومان",
-                        "aggregateRating" => $residence->comments->count() > 0 ? [
-                            "@type" => "AggregateRating",
-                            "ratingValue" => number_format($residence->point, 1),
-                            "ratingCount" => $residence->comments->count(),
-                            "bestRating" => "5",
-                            "worstRating" => "0"
-                        ] : null
-                    ]
-                ];
-            })->toArray(),
-        ];
-        
-        // Breadcrumb Schema
-        $breadcrumbSchema = [
-            "@context" => "https://schema.org",
-            "@type" => "BreadcrumbList",
-            "itemListElement" => [
-                [
-                    "@type" => "ListItem",
-                    "position" => 1,
-                    "name" => "صفحه اصلی",
-                    "item" => url('/')
-                ],
-                [
-                    "@type" => "ListItem",
-                    "position" => 2,
-                    "name" => "اقامتگاه‌ها",
-                    "item" => url()->current()
-                ]
-            ]
-        ];
-        
-        // WebPage Schema
-        $webPageSchema = [
-            "@context" => "https://schema.org",
-            "@type" => "WebPage",
-            "name" => "اجاره ویلا، سوئیت، آپارتمان و کلبه در سراسر ایران | " . getConfigs("website-title"),
-            "description" => getConfigs("website-description"),
-            "url" => url()->current(),
-            "potentialAction" => [
-                "@type" => "SearchAction",
-                "target" => url()->current() . "?searchText={search_term_string}",
-                "query-input" => "required name=search_term_string"
-            ],
-            "breadcrumb" => [
-                "@type" => "BreadcrumbList",
-                "itemListElement" => [
-                    [
-                        "@type" => "ListItem",
-                        "position" => 1,
-                        "name" => "صفحه اصلی",
-                        "item" => url('/')
-                    ],
-                    [
-                        "@type" => "ListItem",
-                        "position" => 2,
-                        "name" => "اقامتگاه‌ها",
-                        "item" => url()->current()
-                    ]
-                ]
-            ]
-        ];
-        
-        // Organization Schema
-        $organizationSchema = [
-            "@context" => "https://schema.org",
-            "@type" => "Organization",
-            "name" => getConfigs("website-title"),
-            "description" => getConfigs("website-description"),
-            "url" => url('/'),
-            "logo" => url('storage/injaa_iconInput_1761765907.png'),
-            "contactPoint" => [
-                "@type" => "ContactPoint",
-                "telephone" => "+98-4846",
-                "contactType" => "customer service",
-                "availableLanguage" => "Persian"
-            ],
-            "sameAs" => [
-                "https://instagram.com/injaa_com",
-                "https://t.me/injaa_com"
-            ]
-        ];
-        
-        // FAQ Schema
-        $faqSchema = [
-            "@context" => "https://schema.org",
-            "@type" => "FAQPage",
-            "mainEntity" => [
-                [
-                    "@type" => "Question",
-                    "name" => "چگونه می‌توانم اقامتگاه رزرو کنم؟",
-                    "acceptedAnswer" => [
-                        "@type" => "Answer",
-                        "text" => "برای رزرو اقامتگاه در سایت اینجا، ابتدا مقصد، تاریخ و تعداد نفرات را انتخاب کنید. سپس از بین اقامتگاه‌های موجود، مورد نظر خود را انتخاب و با چند کلیک رزرو را تکمیل نمایید."
-                    ]
-                ],
-                [
-                    "@type" => "Question",
-                    "name" => "آیا امکان لغو رزرو وجود دارد؟",
-                    "acceptedAnswer" => [
-                        "@type" => "Answer",
-                        "text" => "بله، سیاست لغو رزرو برای هر اقامتگاه متفاوت است و در صفحه توضیحات اقامتگاه قابل مشاهده می‌باشد."
-                    ]
-                ],
-                [
-                    "@type" => "Question",
-                    "name" => "چه نوع اقامتگاه‌هایی موجود است؟",
-                    "acceptedAnswer" => [
-                        "@type" => "Answer",
-                        "text" => "انواع ویلا، سوئیت، آپارتمان و کلبه در مناطق جنگلی، ساحلی، کوهستانی، روستایی و شهری در سراسر ایران."
-                    ]
-                ]
-            ]
-        ];
-    @endphp
-
-    {{-- Structured Data در head --}}
-    @push('head')
-        {{-- ItemList Schema --}}
-        <script type="application/ld+json">
-            {!! json_encode($schemaData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        </script>
-        
-        {{-- Breadcrumb Schema --}}
-        <script type="application/ld+json">
-            {!! json_encode($breadcrumbSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        </script>
-        
-        {{-- WebPage Schema --}}
-        <script type="application/ld+json">
-            {!! json_encode($webPageSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        </script>
-        
-        {{-- Organization Schema --}}
-        <script type="application/ld+json">
-            {!! json_encode($organizationSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        </script>
-        
-        {{-- FAQ Schema --}}
-        <script type="application/ld+json">
-            {!! json_encode($faqSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
-        </script>
-        
-        {{-- LocalBusiness Schema (اختیاری) --}}
-        <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": ["TravelAgency", "LocalBusiness"],
-            "name": "{{ getConfigs('website-title') }}",
-            "image": "{{ url('storage/injaa_iconInput_1761765907.png') }}",
-            "description": "{{ getConfigs('website-description') }}",
-            "address": {
-                "@type": "PostalAddress",
-                "streetAddress": "تهران ژاندارمری خیابان ایثار نبش خیابان مالک",
-                "addressLocality": "تهران",
-                "addressCountry": "IR"
-            },
-            "telephone": "+98-4846",
-            "openingHours": "Mo-Su 00:00-23:59",
-            "url": "{{ url('/') }}",
-            "priceRange": "$$",
-            "sameAs": [
-                "https://instagram.com/injaa_com",
-                "https://t.me/injaa_com"
-            ]
+    <style>
+        :root {
+            --primary: #66ccff;
+            --secondary: #0A2B4E;
+            --accent: #F59E0B;
+            --gray-50: #F8FAFC;
+            --gray-100: #F1F5F9;
+            --gray-500: #64748B;
+            --gray-700: #334155;
+            --border: #E2E8F0;
         }
-        </script>
-    @endpush
-
-    {{-- Breadcrumb Navigation --}}
-    <nav aria-label="breadcrumb" style="padding: 10px 0; background-color: #f8f9fa; border-radius: 5px; margin-bottom: 20px;">
-        <ol class="breadcrumb mb-0" style="background: transparent; padding: 0 15px;">
-            <li class="breadcrumb-item">
-                <a href="{{ url('/') }}" class="text-decoration-none text-primary">
-                    <i class="fa fa-home"></i> صفحه اصلی
-                </a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                <i class="fa fa-building"></i> اقامتگاه‌ها
-            </li>
-        </ol>
-    </nav>
-
-<div class="row text-center align-items-center" id="btns">
-    <div class="col-3 mb-3">
-        <a href="{{ \Illuminate\Support\Facades\URL::to('') }}" class="d-flex flex-column align-items-center text-decoration-none text-dark" aria-label="اقامتگاه ها">
-            <i class="fa fa-home mb-1" style="font-size: 1.4rem;"></i>
-            <span class="fw-semibold" style="font-size: 0.75rem;">اقامتگاه ها</span>
-        </a>
-    </div>
-    <div class="col-3 mb-3">
-        <a href="{{ \Illuminate\Support\Facades\URL::to('tours') }}" class="d-flex flex-column align-items-center text-decoration-none text-dark" aria-label="تورها">
-            <i class="fa fa-map-pin mb-1" style="font-size: 1.4rem;"></i>
-            <span class="fw-semibold" style="font-size: 0.75rem;">تورها</span>
-        </a>
-    </div>
-    <div class="col-3 mb-3">
-        <a href="{{ \Illuminate\Support\Facades\URL::to('stores') }}" class="d-flex flex-column align-items-center text-decoration-none text-dark" aria-label="رستوران‌ها">
-            <i class="fa fa-cutlery mb-1" style="font-size: 1.4rem;"></i>
-            <span class="fw-semibold" style="font-size: 0.75rem;">رستوران‌ها</span>
-        </a>
-    </div>
-    <div class="col-3 mb-3">
-        <a href="{{ \Illuminate\Support\Facades\URL::to('friends') }}" class="d-flex flex-column align-items-center text-decoration-none text-dark" aria-label="همسفران">
-            <i class="fa fa-users mb-1" style="font-size: 1.4rem;"></i>
-            <span class="fw-semibold" style="font-size: 0.75rem;">همسفران</span>
-        </a>
-    </div>
-</div>
-    <hr>
-    <section itemscope itemtype="https://schema.org/WebPage">
-        <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10">
-                <form wire:submit.prevent="search" role="search" aria-label="جستجوی اقامتگاه">
-                    <input wire:model.defer="searchText"
-                        type="search"
-                        placeholder="جستجوی کد یا عنوان اقامتگاه"
-                        class="form-control form-control-sm"
-                        style="padding: 1.15rem"
-                        aria-label="عبارت جستجو">
-
-                    <button type="submit" class="btn btn-primary"
-                            style="position: absolute; top: 0; left: 16px; padding-left: 25px!important; padding-right: 25px!important;"
-                            aria-label="انجام جستجو">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-        <br>
-        <form  wire:submit="filter">
-        <ul class="filter-items">
-            <li>
-                <select wire:model.live="p" class="form-control form-control-sm" aria-label="انتخاب استان">
-                    <option value="0">استان (همه)</option>
-                    @foreach($provinces as $province)
-                        <option {{$p==$province->id?"selected":""}} value="{{$province->id}}">{{$province->name}}</option>
-                    @endforeach
-                </select>
-            </li>
-            <li>
-                <select wire:model.live="c" {{$p==0?"disabled":""}} class="form-control form-control-sm" aria-label="انتخاب شهر">
-                    <option value="0">شهر(همه)</option>
-                    @foreach(\App\Models\City::where("is_use",true)->where("province_id",$p)->get() as $province)
-                        <option {{$p==$province->id?"selected":""}} value="{{$province->id}}">{{$province->name}}</option>
-                    @endforeach
-                </select>
-            </li>
-            <li>
-                <select  wire:model.live="n" class="form-control form-control-sm" aria-label="تعداد نفرات">
-                    <option value="0">تعداد نفرات</option>
-                    <option value="1">1 نفر</option>
-                    <option value="2">2 نفر</option>
-                    <option value="3">3 نفر</option>
-                    <option value="4">4 نفر</option>
-                    <option value="5">5 نفر</option>
-                    <option value="6">6 نفر</option>
-                    <option value="7">7 نفر</option>
-                    <option value="8">8 نفر</option>
-                    <option value="9">9 نفر</option>
-                    <option value="10">10 نفر</option>
-                    <option value="11">11 نفر</option>
-                </select>
-            </li>
-            <li>
-                <select  wire:model.live="r" class="form-control form-control-sm" aria-label="تعداد اتاق">
-                    <option value="0">تعداد اتاق</option>
-                    <option value="1">1 اتاق</option>
-                    <option value="2">2 اتاق</option>
-                    <option value="3">3 اتاق</option>
-                    <option value="4">4 اتاق</option>
-                    <option value="5">5 اتاق</option>
-                </select>
-            </li>
-            <li>
-                <select  wire:model.live="a"  class="form-control form-control-sm" aria-label="مرتب سازی قیمت">
-                    <option value="0">مرتب سازی (قیمت)</option>
-                    <option value="1">ارزان ترین</option>
-                    <option value="2">گران ترین</option>
-                </select>
-            </li>
-            <li>
-                <select wire:model.live="area"  class="form-control form-control-sm" aria-label="نوع ملک">
-                    <option value="0">نوع ملک</option>
-                    @foreach(\App\Models\Residence::getAreaType() as $key=>$item)
-                        <option value="{{$key}}">{{$item}}</option>
-                    @endforeach
-                </select>
-            </li>
-            <li style="margin-right: 16px">
-                <button style="border: 1px solid #999" class="btn btn-sm btn-light" type="button"
-                        data-toggle="collapse" data-target="#collapse-filter" aria-expanded="false"
-                        aria-controls="collapse-filter" aria-label="جستجوی پیشرفته">
-                    جستجوی پیشرفته
-                    <i class="fa fa-search"></i>
-                </button>
-            </li>
-        </ul>
-        <ul wire:ignore class="collapse filter-items" id="collapse-filter">
-            @foreach(\App\Models\Residence::getResidenceType() as $key=>$item)
-            <li>
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" wire:model.live="residenceType" value="{{$key}}" id="customSwitch-{{$key}}" aria-label="{{$item}}">
-                    <label class="custom-control-label" for="customSwitch-{{$key}}">{{$item}}</label>
-                </div>
-            </li>
-            @endforeach
-            @foreach(\App\Models\Option::where("show_filter",true)->where("type","residence")->get() as $key=>$item)
-            <li>
-                <div class="custom-control custom-switch">
-                    <input type="checkbox" class="custom-control-input" wire:model.live="options" value="{{$item->id}}" id="option-{{$item->id}}" aria-label="{{$item->title}}">
-                    <label class="custom-control-label" for="option-{{$item->id}}">{{$item->title}}</label>
-                </div>
-            </li>
-            @endforeach
-        </ul>
-        </form>
-    </section>
-    <hr>
-    <section>
-        <h1 style="font-size: 30px;margin-top: 16px" itemprop="headline">اجاره ویلا، سوئیت، آپارتمان و کلبه در سراسر ایران</h1>
-        <p class="text-muted" style="font-size: 16px; margin-bottom: 20px;" itemprop="description">
-            رزرو آنلاین بهترین اقامتگاه‌های ایران با تضمین کیفیت و قیمت مناسب - بیش از {{ $residences->total() }} اقامتگاه در سراسر کشور
-        </p>
         
-        <div  style="text-align: center">
-            <img wire:loading src="{{asset('storage/static/loading.gif')}}" style="margin: 40px auto;width: 200px;opacity: .5;" alt="در حال بارگذاری اقامتگاه‌ها...">
-        </div>
-        
-<!-- در بخش لیست اقامتگاه‌ها -->
-<ul wire:loading.remove id="residences" itemscope itemtype="https://schema.org/ItemList">
-    @foreach($residences as $index => $residence)
-        @php
-            $provinceName = $provinces[$residence->province_id]->name ?? 'نامشخص';
-            $cityName = $cities[$residence->city_id]->name ?? 'نامشخص';
-            $residenceType = \App\Models\Residence::getResidenceType()[$residence->residence_type] ?? 'اقامتگاه';
-            $areaType = \App\Models\Residence::getAreaType()[$residence->area_type] ?? '';
-        @endphp
-        
-        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-            <meta itemprop="position" content="{{ $index + 1 }}">
-            <div itemprop="item" itemscope itemtype="https://schema.org/VacationRental">
-                <meta itemprop="url" content="{{ url('detail/' . $residence->id) }}">
-                <meta itemprop="address" content="{{ $cityName }}, {{ $provinceName }}">
-                
-                <h3 itemprop="name">{{ $residence->title }}</h3>
-                <span class="line"></span>
-                <div class="image-container">
-                    <img src="{{ asset('storage/residences/' . $residence->image) }}"
-                         alt="{{ $residence->title }} - {{ $residenceType }} {{ $areaType }} در {{ $cityName }}"
-                         loading="lazy"
-                         width="400"
-                         height="300"
-                         onerror="this.onerror=null; this.src='{{ asset('storage/static/onerror.jpg') }}'"
-                         itemprop="image">
-                </div>
-                <span class="line"></span>
-                <div class="d-flex flex-row justify-content-around p-2">
-                    <span style="font-size: 12px">برای 1 شب</span>
-                    <span style="font-size: 14px" itemprop="priceRange">
-                        <span class="font-weight-bold" itemprop="price">
-                            {{ convertEnglishToPersianNumbers(number_format($residence->amount)) }}
-                        </span> تومان
-                    </span>
-                </div>
-                <span class="line"></span>
-                <div class="services d-flex flex-row justify-content-between align-items-center p-2">
-                    <div class="d-flex align-items-center">
-                        <span itemprop="occupancy" class="ml-3">
-                            <i class="fa fa-users"></i>
-                            {{ $residence->people_number }} نفر
-                        </span>
-                        <span itemprop="floorSize" class="ml-3">
-                            <i class="fa fa-expand"></i>
-                            {{ $residence->area }} متر
-                        </span>
-                        <span itemprop="numberOfRooms">
-                            <i class="fa fa-bed"></i>
-                            {{ $residence->room_number }} اتاق
-                        </span>
-                    </div>
-                    
-                    @if($residence->point > 0)
-                    <div class="d-flex align-items-center"
-                         itemprop="aggregateRating"
-                         itemscope
-                         itemtype="https://schema.org/AggregateRating">
-                        <span class="badge d-flex align-items-center px-2 py-1"
-                              style="background:#1fa463;color:#fff;font-size:12px;font-weight:600">
-                            <i class="fa fa-star ml-1" style="color:#fff"></i>
-                            <span itemprop="ratingValue" style="color:#fff">
-                                {{ number_format($residence->point,1) }}
-                            </span>
-                        </span>
-                        <small class="mr-2" style="color:#666">
-                            {{ $residence->comments->count() }} نظر
-                        </small>
-                        <meta itemprop="ratingCount" content="{{ $residence->comments->count() }}">
-                        <meta itemprop="bestRating" content="5">
-                        <meta itemprop="worstRating" content="1">
-                    </div>
-                    @endif
-                </div>
-                
-                <!-- بخش دکمه ثبت رزرو که برگردانده شد -->
-                <span class="line"></span>
-                <div class="d-flex flex-row justify-content-between p-2">
-                    <a href="{{ url('detail/' . $residence->id) }}"
-                       class="w-100 pt-1 pb-1 pl-4 pr-4 btn btn-success"
-                       style="padding-left: 1.5rem !important; font-size: 14px"
-                       aria-label="ثبت رزرو {{ $residence->title }}"
-                       title="ثبت رزرو {{ $residence->title }}">
-                        ثبت رزرو
-                        <i class="fa fa-calendar-check-o mr-1"></i>
-                    </a>
-                </div>
-            </div>
-        </li>
-    @endforeach
-</ul>
-        <br>
-        <div class="row justify-content-center">
-            {{ $residences->links('vendor.pagination.default') }}
-        </div>
-    </section>
-
-<div class="container mt-4 mb-4" itemscope itemtype="https://schema.org/FAQPage">
-    <h2 style="font-size: 18px; margin-bottom: 15px; color: #333; font-weight: bold;">
-        رزرو آنلاین بهترین اقامتگاه های ایران
-    </h2>
-    
-    <div itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
-        <h3 itemprop="name" style="font-size: 16px; color: #444; margin-top: 20px;">چگونه در سایت اینجا اقامتگاه رزرو کنم؟</h3>
-        <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
-            <p itemprop="text" style="font-size: 14px; line-height: 1.7; text-align: justify; color: #555;">
-                <strong>اینجا</strong> با پوشش کامل <strong>اقامتگاه های ویلا، سوئیت، آپارتمان و کلبه</strong> در مناطق گردشگری سراسر ایران، شما را بیش از هر سامانه رزرو آنلاین دیگری برای اجاره و رزرو اقامتگاه یاری می‌کند. برای رزرو اقامتگاه، مثلاً اجاره ویلا در شمال، کافی است پس از ورود به وب‌سایت اینجا، وارد صفحه جستجوی اقامتگاه شده و اطلاعات مورد نیاز مانند مقصد، تاریخ و تعداد نفرات را وارد کنید.
-            </p>
-        </div>
-    </div>
-    
-    <div itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
-        <h3 itemprop="name" style="font-size: 16px; color: #444; margin-top: 20px;">چه استان‌هایی تحت پوشش هستند؟</h3>
-        <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
-            <p itemprop="text" style="font-size: 14px; line-height: 1.7; text-align: justify; color: #555;">
-                به‌این‌ترتیب، در کوتاه‌ترین زمان ممکن، با تنوع گسترده‌ای از اقامتگاه‌های <strong>استخردار، ساحلی، جنگلی و روستایی</strong> در استان‌های <strong>البرز، گلستان، گیلان، مازندران، هرمزگان، بوشهر و خوزستان</strong> مواجه می‌شوید.
-            </p>
-        </div>
-    </div>
-    
-    <div itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
-        <h3 itemprop="name" style="font-size: 16px; color: #444; margin-top: 20px;">چه مزایایی نسبت به سایر سایت‌ها دارید؟</h3>
-        <div itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
-            <p itemprop="text" style="font-size: 14px; line-height: 1.7; text-align: justify; color: #555;">
-                تنها با چند کلیک ساده، رزرو آنلاین اقامتگاه به تمام مقاصد گردشگری ایران را از میان انواع ویلاهای لوکس، آپارتمان‌های مبله، سوئیت‌های اقتصادی و کلبه‌های بوم‌گردی در سایت اینجا انجام دهید. از اجاره ویلا در رامسر گرفته تا کلبه در انزلی، آپارتمان در اصفهان و سوئیت در کیش، کافی است به‌صورت اینترنتی اقامتگاه‌های موجود را در اینجا جستجو کنید. در این صورت می‌توانید به‌راحتی به این نکته پی ببرید که چه اقامتگاه‌هایی با چه امکاناتی، در چه موقعیت مکانی و با چه قیمتی می‌توانند میزبان سفر شما باشند. با توجه به تنوع گسترده اقامتگاه‌ها و همچنین درج کامل اطلاعات، تصاویر باکیفیت و نظرات مسافران قبلی، این امکان فراهم شده تا با مقایسه امکانات و قیمت‌ها، همواره مناسب‌ترین و باکیفیت‌ترین اقامتگاه را از اینجا رزرو کنید. رزرو مستقیم با مالکان معتبر، تضمین بهترین قیمت بدون کمیسیون اضافه، پشتیبانی ۲۴ ساعته و امکان بازدید قبل از پرداخت، از مزایای انحصاری رزرو از طریق اینجا می‌باشد.
-            </p>
-        </div>
-    </div>
-</div>
-
-{{-- Additional Structured Data --}}
-@push('scripts')
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "SiteNavigationElement",
-    "name": "منوی اصلی",
-    "url": "{{ url('/') }}",
-    "potentialAction": [
-        {
-            "@type": "Action",
-            "name": "اقامتگاه‌ها",
-            "url": "{{ url('/') }}"
-        },
-        {
-            "@type": "Action",
-            "name": "تورها",
-            "url": "{{ url('tours') }}"
-        },
-        {
-            "@type": "Action",
-            "name": "رستوران‌ها",
-            "url": "{{ url('stores') }}"
-        },
-        {
-            "@type": "Action",
-            "name": "همسفران",
-            "url": "{{ url('friends') }}"
+        /* منوی سریع */
+        .nav-quick {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0 30px;
         }
-    ]
+        
+        .nav-quick-item {
+            flex: 1;
+            background: white;
+            text-align: center;
+            padding: 14px 8px;
+            border-radius: 60px;
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 500;
+            font-size: 14px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        
+        .nav-quick-item i {
+            color: var(--primary);
+            margin-left: 8px;
+        }
+        
+        .nav-quick-item:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+        
+        /* باکس جستجو */
+        .search-box {
+            background: white;
+            border-radius: 60px;
+            padding: 6px;
+            display: flex;
+            gap: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            padding: 14px 22px;
+            border-radius: 60px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .search-btn {
+            background: var(--secondary);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* فیلترها */
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-select {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 10px 20px;
+            font-size: 13px;
+            color: var(--gray-700);
+            cursor: pointer;
+        }
+        
+        .filter-advance-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            padding: 10px 20px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* پنل فیلتر پیشرفته */
+        .advanced-panel {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            margin: 15px 0 25px;
+            border: 1px solid var(--border);
+            display: none;
+        }
+        
+        .advanced-panel.show {
+            display: block;
+        }
+        
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        
+        .filter-group-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 12px;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        /* عنوان صفحه */
+        .page-header {
+            margin: 30px 0 20px;
+        }
+        
+        .page-header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+        
+        .page-header p {
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+        
+        /* گرید کارت‌ها */
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            margin: 30px 0;
+        }
+        
+        .property-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+        }
+        
+        .property-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.1);
+        }
+        
+        .card-image {
+            width: 100%;
+            height: 210px;
+            object-fit: cover;
+        }
+        
+        .card-content {
+            padding: 16px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+        
+        .card-location {
+            font-size: 12px;
+            color: var(--gray-500);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .card-location i {
+            color: var(--primary);
+        }
+        
+        .price-tag {
+            background: var(--gray-50);
+            padding: 10px 12px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+        }
+        
+        .price-amount {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--secondary);
+        }
+        
+        .price-amount small {
+            font-size: 11px;
+            font-weight: normal;
+        }
+        
+        .rating-badge {
+            background: #10B981;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .card-features {
+            display: flex;
+            gap: 14px;
+            font-size: 12px;
+            color: var(--gray-500);
+            margin: 12px 0;
+        }
+        
+        .card-features span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .card-features i {
+            color: var(--primary);
+        }
+        
+        .btn-reserve {
+            display: block;
+            width: 100%;
+            background: var(--accent);
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+        
+        .btn-reserve:hover {
+            background: #D97706;
+        }
+        
+        /* صفحه‌بندی */
+        .pagination-modern {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 40px 0 20px;
+        }
+        
+        .page-btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--gray-700);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .page-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+        
+        /* لودینگ */
+        .loading-spinner {
+            text-align: center;
+            padding: 60px;
+        }
+        
+/* بنر تمام واید فصلی - ساده و تمیز */
+.hero-season {
+    position: relative;
+    width: calc(100% + 48px);
+    margin-left: -24px;
+    margin-right: -24px;
+    min-height: 280px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 30px;
+    background-color: #0A2B4E;
 }
-</script>
 
-<script>
-// Dynamic Structured Data for current page
-document.addEventListener('DOMContentLoaded', function() {
-    const dynamicSchema = {
-        "@context": "https://schema.org",
-        "@type": "WebPage",
-        "name": document.title,
-        "description": "{{ getConfigs('website-description') }}",
-        "url": window.location.href,
-        "datePublished": "{{ now()->toIso8601String() }}",
-        "dateModified": "{{ now()->toIso8601String() }}",
-        "publisher": {
-            "@type": "Organization",
-            "name": "{{ getConfigs('website-title') }}",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "{{ url('storage/injaa_iconInput_1761765907.png') }}"
+/* اوورلی بسیار نازک (فقط 10% مشکی برای خوانایی متن) */
+.hero-overlay-light {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.1);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 50px 24px;
+}
+
+.hero-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.hero-icon i {
+    font-size: 40px;
+    color: white;
+}
+
+.hero-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 12px;
+    text-shadow: 0 4px 1px rgba(0,0,0,0.9);
+}
+
+.hero-desc {
+    font-size: 16px;
+    color: rgba(255,255,255,0.95);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+}
+
+@media (max-width: 768px) {
+    .hero-season {
+        width: calc(100% + 32px);
+        margin-left: -16px;
+        margin-right: -16px;
+        min-height: 220px;
+    }
+    
+    .hero-content {
+        padding: 35px 20px;
+    }
+    
+    .hero-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .hero-icon i {
+        font-size: 30px;
+    }
+    
+    .hero-title {
+        font-size: 24px;
+    }
+    
+    .hero-desc {
+        font-size: 14px;
+    }
+}
+        
+        /* شهرهای محبوب */
+        .popular-cities {
+            margin: 30px 0 40px;
+        }
+        
+.cities-header {
+    margin-bottom: 20px;
+}
+
+.cities-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--secondary);
+    margin: 0;
+}
+        
+        .cities-view-all {
+            font-size: 13px;
+            color: var(--primary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .cities-view-all:hover {
+            color: var(--accent);
+        }
+        
+        .cities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+        }
+        
+        .city-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+        
+        .city-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px -12px rgba(0,0,0,0.15);
+        }
+        
+        .city-image {
+            width: 100%;
+            height: 110px;
+            overflow: hidden;
+        }
+        
+        .city-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        .city-card:hover .city-image img {
+            transform: scale(1.05);
+        }
+        
+        .city-info {
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .city-name {
+            display: block;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 4px;
+        }
+        
+        .city-count {
+            display: block;
+            font-size: 11px;
+            color: var(--gray-500);
+        }
+        
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+                border-radius: 28px;
+            }
+            
+            .filters-row {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 8px;
+            }
+            
+            .filter-select, .filter-advance-btn {
+                white-space: nowrap;
+            }
+            
+            .page-header h1 {
+                font-size: 20px;
+            }
+            
+            .hero-season {
+                width: calc(100% + 32px);
+                margin-left: -16px;
+                margin-right: -16px;
+                min-height: 280px;
+            }
+            
+            .hero-content {
+                padding: 40px 20px;
+            }
+            
+            .hero-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .hero-icon i {
+                font-size: 30px;
+            }
+            
+            .hero-title {
+                font-size: 24px;
+            }
+            
+            .hero-desc {
+                font-size: 14px;
+            }
+            
+            .cities-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .city-image {
+                height: 90px;
+            }
+            
+            .city-name {
+                font-size: 13px;
             }
         }
-    };
+        
+        @media (max-width: 480px) {
+            .nav-quick {
+                gap: 8px;
+            }
+            
+            .nav-quick-item {
+                font-size: 11px;
+                padding: 10px 6px;
+            }
+            
+            .cities-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .cities-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-datetime {
+                font-size: 11px;
+                padding: 6px 16px;
+            }
+        }
+    </style>
     
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.textContent = JSON.stringify(dynamicSchema);
-    document.head.appendChild(script);
-});
-</script>
-@endpush
+{{-- ===== بنر تمام واید فصلی (بدون ساعت، بدون دکمه) ===== --}}
+@php
+    $currentMonth = date('n');
+    $seasonData = [
+        'winter' => ['months' => [12,1,2], 'title' => 'زمستان سفید شمال', 'desc' => 'برف و کوهستان‌های رویایی منتظر شماست', 'icon' => 'fa-snowflake-o', 'bgImage' => 'winter-bg.jpg'],
+        'spring' => ['months' => [3,4,5], 'title' => 'بهار شمال، جشن شکوفه‌ها', 'desc' => 'دل‌انگیزترین فصل برای سفر به شمال', 'icon' => 'fa-leaf', 'bgImage' => 'spring-bg.jpg'],
+        'summer' => ['months' => [6,7,8], 'title' => 'تابستان داغ، شمال خنک', 'desc' => 'فرار از گرما به جنگل‌های شمال', 'icon' => 'fa-sun-o', 'bgImage' => 'summer-bg.jpg'],
+        'autumn' => ['months' => [9,10,11], 'title' => 'پاییز رنگی شمال', 'desc' => 'زیباترین فصل برای عکاسی و طبیعت‌گردی', 'icon' => 'fa-tree', 'bgImage' => 'autumn-bg.jpg'],
+    ];
+    
+    $currentSeason = 'spring';
+    foreach ($seasonData as $season => $data) {
+        if (in_array($currentMonth, $data['months'])) {
+            $currentSeason = $season;
+            break;
+        }
+    }
+    $season = $seasonData[$currentSeason];
+    
+    $bgImagePath = asset('storage/static/seasons/' . $season['bgImage']);
+    $hasBgImage = file_exists(public_path('storage/static/seasons/' . $season['bgImage']));
+@endphp
 
+<div class="hero-season" @if($hasBgImage) style="background-image: url('{{ $bgImagePath }}');" @endif>
+    <div class="hero-overlay-light"></div>
+    <div class="hero-content">
+        <div class="hero-icon">
+            <i class="fa {{ $season['icon'] }}"></i>
+        </div>
+        <h1 class="hero-title">{{ $season['title'] }}</h1>
+        <p class="hero-desc">{{ $season['desc'] }}</p>
+    </div>
 </div>
+    
+{{-- ===== شهرهای محبوب ===== --}}
+<div class="popular-cities">
+    <div class="cities-header">
+        <h2 class="cities-title">🏙️ شهرهای محبوب برای اجاره ویلا</h2>
+        {{-- لینک "مشاهده همه" حذف شد --}}
+    </div>
+    <div class="cities-grid">
+        @php
+            $popularCities = [
+                ['id' => 1, 'slug' => 'chalus', 'name' => 'چالوس', 'count' => 24, 'image' => 'chalus.jpg'],
+                ['id' => 2, 'slug' => 'ramsar', 'name' => 'رامسر', 'count' => 18, 'image' => 'ramsar.jpg'],
+                ['id' => 3, 'slug' => 'gorgan', 'name' => 'گرگان', 'count' => 22, 'image' => 'gorgan.jpg'],
+                ['id' => 4, 'slug' => 'masal', 'name' => 'ماسال', 'count' => 15, 'image' => 'masal.jpg'],
+                ['id' => 5, 'slug' => 'rasht', 'name' => 'رشت', 'count' => 28, 'image' => 'rasht.jpg'],
+                ['id' => 6, 'slug' => 'sari', 'name' => 'ساری', 'count' => 31, 'image' => 'sari.jpg'],
+                ['id' => 7, 'slug' => 'noor', 'name' => 'نور', 'count' => 12, 'image' => 'noor.jpg'],
+                ['id' => 8, 'slug' => 'behshahr', 'name' => 'بهشهر', 'count' => 9, 'image' => 'behshahr.jpg'],
+            ];
+        @endphp
+        
+        @foreach($popularCities as $city)
+            <a href="{{ url('/?city_id=' . $city['id']) }}" class="city-card">
+                <div class="city-image">
+                    <img src="{{ asset('storage/static/cities/' . $city['image']) }}" 
+                         alt="{{ $city['name'] }}"
+                         loading="lazy"
+                         onerror="this.src='{{ asset('storage/static/city-placeholder.jpg') }}'">
+                </div>
+                <div class="city-info">
+                    <span class="city-name">{{ $city['name'] }}</span>
+                    <span class="city-count">{{ $city['count'] }} اقامتگاه</span>
+                </div>
+            </a>
+        @endforeach
+    </div>
+</div>
+    
+    {{-- ===== جستجو ===== --}}
+    <div class="search-box">
+        <input type="text" wire:model.defer="searchText" placeholder="جستجوی نام یا کد اقامتگاه..." class="search-input" wire:keydown.enter="search">
+        <button type="button" wire:click="search" class="search-btn"><i class="fa fa-search"></i> جستجو</button>
+    </div>
+    
+    {{-- ===== فیلترها ===== --}}
+    <div class="filters-row">
+        <select wire:model.live="p" class="filter-select">
+            <option value="0">🏠 همه استان‌ها</option>
+            @foreach($provinces as $province)
+                <option value="{{ $province->id }}">{{ $province->name }}</option>
+            @endforeach
+        </select>
+        
+        <select wire:model.live="c" class="filter-select" {{ $p == 0 ? 'disabled' : '' }}>
+            <option value="0">📍 همه شهرها</option>
+            @foreach(\App\Models\City::where("is_use",true)->where("province_id",$p)->get() as $city)
+                <option value="{{ $city->id }}">{{ $city->name }}</option>
+            @endforeach
+        </select>
+        
+        <select wire:model.live="n" class="filter-select">
+            <option value="0">👥 تعداد نفرات</option>
+            @for($i=1; $i<=12; $i++)
+                <option value="{{ $i }}">{{ $i }} نفر</option>
+            @endfor
+        </select>
+        
+        <select wire:model.live="a" class="filter-select">
+            <option value="0">💰 مرتب‌سازی</option>
+            <option value="1">ارزان‌ترین</option>
+            <option value="2">گران‌ترین</option>
+        </select>
+        
+        <button type="button" class="filter-advance-btn" onclick="toggleAdvanced()">
+            <i class="fa fa-sliders-h"></i> بیشتر
+        </button>
+    </div>
+    
+    {{-- ===== فیلتر پیشرفته ===== --}}
+    <div id="advancedPanel" class="advanced-panel">
+        <div class="filter-group">
+            <div class="filter-group-title">نوع اقامتگاه</div>
+            <div class="filter-options">
+                @foreach(\App\Models\Residence::getResidenceType() as $key => $item)
+                    <label class="filter-option">
+                        <input type="checkbox" wire:model.live="residenceType" value="{{ $key }}">
+                        <span>{{ $item }}</span>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+        
+        <div class="filter-group">
+            <div class="filter-group-title">امکانات ویژه</div>
+            <div class="filter-options">
+                @foreach(\App\Models\Option::where("show_filter",true)->where("type","residence")->get() as $item)
+                    <label class="filter-option">
+                        <input type="checkbox" wire:model.live="options" value="{{ $item->id }}">
+                        <span>{{ $item->title }}</span>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+    </div>
+    
+    {{-- ===== عنوان صفحه ===== --}}
+    <div class="page-header">
+        <h1>اجاره ویلا، سوئیت، آپارتمان و کلبه در ایران</h1>
+        <p>{{ number_format($residences->total()) }} اقامتگاه | بهترین قیمت | پشتیبانی ۲۴ ساعته</p>
+    </div>
+    
+    {{-- ===== لودینگ ===== --}}
+    <div wire:loading class="loading-spinner">
+        <img src="{{ asset('storage/static/loading.gif') }}" style="width: 50px; opacity: 0.4;" alt="loading">
+    </div>
+    
+    {{-- ===== لیست اقامتگاه‌ها ===== --}}
+    <div wire:loading.remove>
+        @if($residences->count() > 0)
+            <div class="properties-grid">
+                @foreach($residences as $residence)
+                    @php
+                        $provinceName = $provinces[$residence->province_id]->name ?? '';
+                        $cityName = $cities[$residence->city_id]->name ?? '';
+                    @endphp
+                    
+                    <div class="property-card">
+                        <img class="card-image" src="{{ asset('storage/residences/' . $residence->image) }}" alt="{{ $residence->title }}" loading="lazy" onerror="this.src='{{ asset('storage/static/onerror.jpg') }}'">
+                        
+                        <div class="card-content">
+                            <h3 class="card-title">{{ $residence->title }}</h3>
+                            <div class="card-location">
+                                <i class="fa fa-map-marker"></i>
+                                <span>{{ $cityName }}، {{ $provinceName }}</span>
+                            </div>
+                            
+                            <div class="price-tag">
+                                <span class="price-amount">{{ number_format($residence->amount) }} <small>تومان</small></span>
+                                @if($residence->point > 0)
+                                    <span class="rating-badge"><i class="fa fa-star"></i> {{ number_format($residence->point, 1) }}</span>
+                                @endif
+                            </div>
+                            
+                            <div class="card-features">
+                                <span><i class="fa fa-users"></i> {{ $residence->people_number }} نفر</span>
+                                <span><i class="fa fa-bed"></i> {{ $residence->room_number }} اتاق</span>
+                                <span><i class="fa fa-expand"></i> {{ $residence->area }} متر</span>
+                            </div>
+                            
+<a href="{{ url('detail/' . $residence->id) }}" class="btn-reserve">
+    <i class="fa fa-calendar-check-o"></i> ثبت رزرو
+</a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            
+            {{-- صفحه‌بندی --}}
+            <div class="pagination-modern">
+                @if($residences->onFirstPage())
+                    <span class="page-btn" style="opacity:0.4">قبلی</span>
+                @else
+                    <a href="#" wire:click="previousPage" class="page-btn">قبلی</a>
+                @endif
+                
+                <span class="page-btn active">{{ $residences->currentPage() }}</span>
+                
+                @if($residences->hasMorePages())
+                    <a href="#" wire:click="nextPage" class="page-btn">بعدی</a>
+                @else
+                    <span class="page-btn" style="opacity:0.4">بعدی</span>
+                @endif
+            </div>
+        @else
+            <div style="text-align: center; padding: 60px; background: white; border-radius: 24px; border: 1px solid var(--border);">
+                <i class="fa fa-home" style="font-size: 48px; color: var(--border);"></i>
+                <p style="margin-top: 16px; color: var(--gray-500);">هیچ اقامتگاهی یافت نشد</p>
+            </div>
+        @endif
+    </div>
+</div>
+
+<script>
+function toggleAdvanced() {
+    document.getElementById('advancedPanel').classList.toggle('show');
+}
+
+</script>

@@ -2,9 +2,7 @@
 @php
     $title = isset($title) ? $title : "";
     $description = isset($description) ? $description : getConfigs("website-description");
-    $logoPath = getConfigs("website-icon") ?: 'injaa_iconInput_1761765907.png';
-    $faviconPath = getConfigs("seo_favicon") ?: $logoPath;
-    $image = isset($image) ? $image : asset("storage/".$logoPath);
+    $image = isset($image) ? $image : asset("storage/".getConfigs("website-icon"));
     $url = url()->current();
     $keywords = isset($keywords) ? $keywords : getConfigs("website-words");
     $isAdminPage = request()->is('admin') || request()->is('admin/*');
@@ -14,251 +12,79 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <style>
-        :root {
-            --primary-color: {{ getConfigs("mainColor") }};
-            --secondary-color: {{ getConfigs("secondaryColor") }};
-        }
-    </style>
-
-    {{-- Primary Meta Tags --}}
+    
     <title>{{ $title ? $title . " | " : "" }}{{ getConfigs("website-title") }}</title>
     <meta name="description" content="{{ $description }}">
-    <meta name="keywords" content="{{ $keywords }}">
-    <meta name="author" content="{{ getConfigs("website-title") }}">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ $url }}">
     
-    {{-- Geo Meta Tags for Iran --}}
-    <meta name="geo.region" content="IR">
-    <meta name="geo.placename" content="ایران">
-    <meta name="geo.position" content="35.6892;51.3890">
-    <meta name="ICBM" content="35.6892, 51.3890">
-    <meta name="language" content="persian">
-    <meta name="country" content="Iran">
-    
-    {{-- Open Graph / Facebook --}}
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ $url }}">
     <meta property="og:title" content="{{ $title ? $title . " | " : "" }}{{ getConfigs("website-title") }}">
     <meta property="og:description" content="{{ $description }}">
     <meta property="og:image" content="{{ $image }}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="{{ getConfigs("website-title") }}">
-    <meta property="og:locale" content="fa_IR">
-    <meta property="og:site_name" content="{{ getConfigs("website-title") }}">
+    <meta property="og:url" content="{{ $url }}">
+    <meta property="og:type" content="website">
     
-    {{-- Twitter --}}
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@injaa_com">
-    <meta name="twitter:creator" content="@injaa_com">
-    <meta name="twitter:url" content="{{ $url }}">
-    <meta name="twitter:title" content="{{ $title ? $title . " | " : "" }}{{ getConfigs("website-title") }}">
-    <meta name="twitter:description" content="{{ $description }}">
-    <meta name="twitter:image" content="{{ $image }}">
-    <meta name="twitter:image:alt" content="{{ getConfigs("website-title") }}">
+    <link rel="icon" href="{{ asset('storage/injaa_iconInput_1761765907.png') }}" type="image/x-icon">
     
-    {{-- Canonical --}}
-    <link rel="canonical" href="{{ $url }}">
+    {{-- استایل‌های Leaflet --}}
+    <link rel="stylesheet" href="https://injaa.com/plugin/leaflet.css">
+    <script src="https://injaa.com/plugin/leaflet.js"></script>
     
-    {{-- Alternate Languages --}}
-    <link rel="alternate" hreflang="fa-ir" href="{{ $url }}">
-    <link rel="alternate" hreflang="x-default" href="{{ $url }}">
+    <meta name="theme-color" content="#66ccff">
     
-    {{-- Favicon and App Icons --}}
-    <link rel="icon" href="{{ asset('storage/'.$faviconPath) }}" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('storage/'.$faviconPath) }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('storage/'.$faviconPath) }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('storage/'.$faviconPath) }}">
-    <link rel="shortcut icon" href="{{ asset('storage/'.$faviconPath) }}">
-    <meta name="msapplication-TileImage" content="{{ asset('storage/'.$faviconPath) }}">
-    
-    {{-- PWA / Mobile --}}
-    <meta name="theme-color" content="{{ getConfigs("mainColor") }}">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="{{ getConfigs("website-title") }}">
-    
-    {{-- Security Headers --}}
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
-    
-    {{-- Preload Resources --}}
-    <link rel="preload" href="{{ asset('plugin/shabnam-font-v1.1.0/Farsi-Digits/Shabnam-FD.woff') }}" as="font" type="font/woff" crossorigin>
-    @if($isAdminPage)
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    @endif
-    
-    {{-- Schema.org Structured Data --}}
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "{{ getConfigs('website-title') }}",
-        "description": "{{ getConfigs('website-description') }}",
-        "url": "{{ url('/') }}",
-        "potentialAction": {
-            "@type": "SearchAction",
-            "target": "{{ url('/') }}?searchText={search_term_string}",
-            "query-input": "required name=search_term_string"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "{{ getConfigs('website-title') }}",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "{{ url('storage/'.$logoPath) }}",
-                "width": "512",
-                "height": "512"
-            }
+    <style>
+        :root {
+            --primary: #66ccff;
+            --secondary: #0A2B4E;
+            --accent: #F59E0B;
         }
-    }
-    </script>
+    </style>
     
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "{{ getConfigs('website-title') }}",
-        "description": "{{ getConfigs('website-description') }}",
-        "url": "{{ url('/') }}",
-        "logo": "{{ url('storage/'.$logoPath) }}",
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "تهران ژاندارمری خیابان ایثار نبش خیابان مالک",
-            "addressLocality": "تهران",
-            "addressCountry": "IR"
-        },
-        "contactPoint": {
-            "@type": "ContactPoint",
-            "telephone": "+98-4846",
-            "contactType": "customer service",
-            "availableLanguage": "Persian"
-        },
-        "sameAs": [
-            "https://instagram.com/injaa_com",
-            "https://t.me/injaa_com"
-        ]
-    }
-    </script>
-
-
-    {{-- jQuery and App Scripts --}}
     <script src="/plugin/jquery/jquery.js"></script>
     @vite(['resources/js/app.js'])
-    
-    {{-- Styles --}}
     @vite(['resources/css/app.less'])
     @livewireStyles
     
-    {{-- Custom Font --}}
     <style>
         @font-face {
             font-family: 'shabnam';
-            src: url('{{asset("plugin/shabnam-font-v1.1.0/Farsi-Digits/Shabnam-FD.eot")}}');
-            src: url('{{asset("plugin/shabnam-font-v1.1.0/Farsi-Digits/Shabnam-FD.ttf")}}') format('truetype');
             src: url('{{asset("plugin/shabnam-font-v1.1.0/Farsi-Digits/Shabnam-FD.woff")}}') format('woff');
             font-display: swap;
         }
-        body:not(.admin-body),
-        body:not(.admin-body) * {
-            font-family: shabnam;
-        }
-
-        .admin-body,
-        .admin-body * {
-            font-family: "Vazirmatn", Tahoma, sans-serif !important;
-        }
-
-        .fa,
-        .fas,
-        .far,
-        .fal,
-        .fab,
-        .fa-solid,
-        .fa-regular,
-        .fa-light,
-        .fa-brands {
-            font-family: FontAwesome !important;
-            font-style: normal !important;
-            font-weight: normal !important;
-        }
+        * { font-family: 'shabnam', Tahoma, sans-serif; }
         
-        .text-primary {
-            color: var(--primary-color) !important;
+        body { background: #F8FAFC; color: #1E293B; }
+        
+        .text-primary { color: #66ccff !important; }
+        .bg-primary { background: #0A2B4E !important; }
+        .btn-primary { background: #0A2B4E !important; border-color: #0A2B4E !important; }
+        .btn-success { background: #F59E0B !important; border-color: #F59E0B !important; }
+        .btn-success:hover { background: #D97706 !important; }
+        
+        .promo-banner {
+            background: #F59E0B;
+            color: #1E293B;
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 500;
         }
-        .bg-primary {
-            background: var(--primary-color) !important;
-        }
-        .bg-c1 {
-            background: var(--primary-color) !important;
-        }
-        .color-c1 {
-            color: var(--primary-color) !important;
-        }
+        .promo-banner a { color: #1E293B; text-decoration: none; font-weight: 700; margin-right: 8px; }
+        .promo-banner a:hover { color: white; }
     </style>
-
-    {{-- Page Specific Head Content --}}
+    
     @stack('head')
 </head>
 
-<body id="body" class="rtl {{ $isAdminPage ? 'admin-body' : '' }}" itemscope itemtype="https://schema.org/WebPage">
-    @if(!$isAdminPage)
-        <header>
-            <div style="background-image: url('{{asset("storage/".getConfigs("bannerSeasonImage"))}}');background-repeat:no-repeat;background-size:cover;background-position:center;background-color:#2c5d90;padding-bottom: 8px;">
-                <div class="container">
-                    <div class="row">
-                        @include("partials.header")
-                    </div>
-                </div>
-            </div>
-            <div class="bg-primary text-white">
-                <div id="header-banner p-0" style="padding: 0!important;margin-top: 0!important;font-size: 14px!important;" class="col-12">
-                    <div class="container p-0">
-                        <p class="banner-text">
-                            <i class="fa fa-bullhorn"></i>
-                            <span class="animated-text">
-                                {{getConfigs("mainBannerText")}}
-                            </span>
-                            <a href="/login" class="banner-btn">شروع میزبانی</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </header>
-        
-        @if(getConfigs("websiteStatus")==1)
-            <div class="container">
-                <main itemprop="mainContentOfPage">
-                    @yield("content")
-                </main>
-            </div>
-        @else
-            <div class="container">
-                <main>
-                    <div style="text-align: center; padding: 50px;">
-                        <h1>درحال تعمیرات</h1>
-                        <p>{{getConfigs("OfflineModeText")}}</p>
-                        <br><br>
-                        <img src="{{asset("storage/".getConfigs("offlineModeIcon"))}}"
-                             style="max-width: 300px;min-width: 200px"
-                             alt="سایت در حال تعمیرات">
-                        <br><br><br>
-                    </div>
-                </main>
-            </div>
-        @endif
-        
-        <footer>
-            @include("partials.footer")
-        </footer>
-    @else
+<body id="body" class="rtl {{ $isAdminPage ? 'admin-body' : '' }}">
+    
+    {{-- ========== بخش ادمین (مدیریت) ========== --}}
+    @if($isAdminPage)
+        {{-- استایل‌های ادمین --}}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler-rtl.min.css">
         @vite(['resources/css/template/admin-app.less'])
+        
         @php
             $path = trim(request()->path(), '/');
             $segments = explode('/', $path);
@@ -340,7 +166,7 @@
                         <div class="employees-online">
                             <div class="employee-avatars">
                                 @foreach($adminPresence as $presence)
-                                    <div class="avatar avatar--{{ $presence['tone'] }}" title="{{ $presence['name'] }} - آنلاین }}">{{ $presence['initial'] }}</div>
+                                    <div class="avatar avatar--{{ $presence['tone'] }}" title="{{ $presence['name'] }} - آنلاین">{{ $presence['initial'] }}</div>
                                 @endforeach
                                 <div class="more-indicator" title="دو نفر دیگر">+۲</div>
                             </div>
@@ -352,8 +178,8 @@
                         </div>
 
                         <span class="mode-indicator" id="siteModeIndicator">
-                            <i class="fa {{ \App\Support\Admin\AdminSiteSettings::revenueModeIcon() }}"></i>
-                            {{ \App\Support\Admin\AdminSiteSettings::revenueModeLabel() }}
+                            <i class="fa fa-chart-line"></i>
+                            حالت عادی
                         </span>
                     </div>
                 </div>
@@ -363,39 +189,368 @@
                 </div>
             </main>
         </div>
+        
+    {{-- ========== بخش فرانت سایت (غیر ادمین) ========== --}}
+    @else
+        <header>
+            <div style="background-image: url('{{asset("storage/".getConfigs("bannerSeasonImage"))}}'); background-size: cover; background-position: center; background-color: #0A2B4E;">
+                <div class="container">
+                    <div class="row">
+                        @include("partials.header")
+                    </div>
+                </div>
+            </div>
+            
+            <div class="promo-banner">
+                <i class="fa fa-bullhorn"></i>
+                {{ getConfigs("mainBannerText") }}
+                <a href="{{ auth()->check() ? url('/dashboard') : url('/login') }}">
+                    شروع میزبانی <i class="fa fa-arrow-left"></i>
+                </a>
+            </div>
+        </header>
+        
+        @if(getConfigs("websiteStatus")==1)
+            <div class="container">
+                <main>
+                    @yield("content")
+                </main>
+            </div>
+        @else
+            <div class="container">
+                <main>
+                    <div style="text-align: center; padding: 50px;">
+                        <h1>درحال تعمیرات</h1>
+                        <p>{{ getConfigs("OfflineModeText") }}</p>
+                        <img src="{{ asset("storage/".getConfigs("offlineModeIcon")) }}" style="max-width: 300px;" alt="تعمیرات">
+                    </div>
+                </main>
+            </div>
+        @endif
+        
+        <footer>
+            @include("partials.footer")
+        </footer>
     @endif
     
     @livewireScripts
-    
-    {{-- Additional Scripts --}}
     @stack('scripts')
     
-    {{-- Dynamic Schema for Current Page --}}
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const dynamicSchema = {
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": document.title,
-            "description": "{{ $description }}",
-            "url": "{{ $url }}",
-            "datePublished": "{{ now()->toIso8601String() }}",
-            "dateModified": "{{ now()->toIso8601String() }}",
-            "publisher": {
-                "@type": "Organization",
-                "name": "{{ getConfigs('website-title') }}",
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": "{{ url('storage/'.$logoPath) }}"
-                }
-            }
-        };
+    {{-- ===== چت بات ===== --}}
+    @if(!$isAdminPage)
+    <style>
+        .chat-wrapper {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            font-family: 'shabnam', Tahoma, sans-serif;
+        }
         
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.textContent = JSON.stringify(dynamicSchema);
-        document.head.appendChild(script);
-    });
+        .chat-toggle-btn {
+            width: 55px;
+            height: 55px;
+            background: #F59E0B;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+        
+        .chat-toggle-btn:hover {
+            transform: scale(1.05);
+            background: #D97706;
+        }
+        
+        .chat-toggle-btn i {
+            font-size: 26px;
+            color: white;
+        }
+        
+        .chat-box {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            width: 320px;
+            max-width: calc(100vw - 40px);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+        }
+        
+        .chat-box.show {
+            display: flex;
+        }
+        
+        .chat-header {
+            background: #0A2B4E;
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-header h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .chat-header h4 i {
+            color: #66ccff;
+            margin-left: 6px;
+        }
+        
+        .chat-header .close-btn {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            padding: 0 5px;
+        }
+        
+        .chat-messages {
+            height: 350px;
+            padding: 12px;
+            overflow-y: auto;
+            background: #F8FAFC;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .message-bot {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 16px;
+            border-top-right-radius: 4px;
+            max-width: 85%;
+            align-self: flex-start;
+            font-size: 12px;
+            color: #1E293B;
+            border: 1px solid #E2E8F0;
+            line-height: 1.5;
+        }
+        
+        .message-user {
+            background: #66ccff;
+            color: #0A2B4E;
+            padding: 8px 12px;
+            border-radius: 16px;
+            border-top-left-radius: 4px;
+            max-width: 85%;
+            align-self: flex-end;
+            font-size: 12px;
+        }
+        
+        .quick-buttons {
+            padding: 10px 12px;
+            border-top: 1px solid #E2E8F0;
+            background: white;
+        }
+        
+        .quick-title {
+            font-size: 10px;
+            color: #64748B;
+            margin-bottom: 8px;
+        }
+        
+        .btn-group-custom {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .quick-btn {
+            background: #F1F5F9;
+            padding: 5px 10px;
+            border-radius: 30px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #0A2B4E;
+        }
+        
+        .quick-btn:hover {
+            background: #66ccff;
+            color: white;
+        }
+        
+        .chat-input-area {
+            display: flex;
+            padding: 10px 12px;
+            border-top: 1px solid #E2E8F0;
+            background: white;
+            gap: 8px;
+        }
+        
+        .chat-input-area input {
+            flex: 1;
+            border: 1px solid #E2E8F0;
+            border-radius: 40px;
+            padding: 8px 14px;
+            font-size: 12px;
+            outline: none;
+        }
+        
+        .chat-input-area input:focus {
+            border-color: #66ccff;
+        }
+        
+        .chat-input-area button {
+            background: #F59E0B;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        @media (max-width: 480px) {
+            .chat-box {
+                width: 300px;
+                right: -10px;
+                bottom: 65px;
+            }
+            
+            .chat-messages {
+                height: 300px;
+            }
+            
+            .chat-toggle-btn {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .chat-toggle-btn i {
+                font-size: 22px;
+            }
+        }
+    </style>
+
+    <div class="chat-wrapper">
+        <div class="chat-toggle-btn" onclick="toggleChat()">
+            <i class="fa fa-commenting"></i>
+        </div>
+        
+        <div class="chat-box" id="chatBox">
+            <div class="chat-header">
+                <h4><i class="fa fa-robot"></i> راهنمای اینجا</h4>
+                <span class="close-btn" onclick="toggleChat()">&times;</span>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message-bot">
+                    👋 سلام! به راهنمای اینجا خوش آمدی.<br>
+                    چطور می‌توانم به تو کمک کنم؟
+                </div>
+            </div>
+            
+            <div class="quick-buttons">
+                <div class="quick-title">⚡ سوالات سریع:</div>
+                <div class="btn-group-custom">
+                    <span class="quick-btn" onclick="askQuestion('چطوری ویلا اجاره کنم؟')">🏠 چطوری اجاره کنم؟</span>
+                    <span class="quick-btn" onclick="askQuestion('بهترین شهر شمال کجاست؟')">📍 بهترین شهر شمال</span>
+                    <span class="quick-btn" onclick="askQuestion('قیمت ویلاها چقدر است؟')">💰 قیمت ویلاها</span>
+                    <span class="quick-btn" onclick="askQuestion('قوانین لغو رزرو چیست؟')">❌ قوانین لغو</span>
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="سوال خود را بنویسید..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">ارسال</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleChat() {
+            const box = document.getElementById('chatBox');
+            box.classList.toggle('show');
+            if (box.classList.contains('show')) {
+                scrollToBottom();
+            }
+        }
+        
+        function scrollToBottom() {
+            const messages = document.getElementById('chatMessages');
+            messages.scrollTop = messages.scrollHeight;
+        }
+        
+        function addMessage(text, isUser) {
+            const messages = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = isUser ? 'message-user' : 'message-bot';
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            messages.appendChild(div);
+            scrollToBottom();
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const question = input.value.trim();
+            if (question === '') return;
+            
+            addMessage(question, true);
+            input.value = '';
+            
+            setTimeout(() => {
+                const answer = getAnswer(question);
+                addMessage(answer, false);
+            }, 400);
+        }
+        
+        function askQuestion(question) {
+            addMessage(question, true);
+            
+            setTimeout(() => {
+                const answer = getAnswer(question);
+                addMessage(answer, false);
+            }, 400);
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function getAnswer(question) {
+            const q = question.toLowerCase();
+            
+            if (q.includes('اجاره') && q.includes('ویلا')) {
+                return '🏠 <b>راهنمای اجاره ویلا:</b><br><br>1️⃣ از فیلترهای بالا استان و شهر را انتخاب کنید<br>2️⃣ تعداد نفرات را مشخص کنید<br>3️⃣ اقامتگاه مورد نظر را انتخاب کنید<br>4️⃣ روی دکمه "ثبت رزرو" کلیک کنید<br><br>✅ همین! رزرو انجام شد.';
+            }
+            
+            if (q.includes('بهترین شهر') || q.includes('شمال')) {
+                return '🌲 <b>بهترین شهرهای شمال:</b><br><br>📍 <b>چالوس</b> - لوکس و شیک<br>📍 <b>رامسر</b> - خانوادگی و آرام<br>📍 <b>گرگان</b> - جنگلی و بکر<br>📍 <b>ماسال</b> - روستایی و ارزان<br><br>کدام شهر مد نظر شماست؟';
+            }
+            
+            if (q.includes('قیمت') || q.includes('هزینه')) {
+                return '💰 <b>محدوده قیمت ویلاها:</b><br><br>🟢 ارزان: ۵۰۰ هزار - ۱ میلیون تومان<br>🟡 متوسط: ۱ - ۲ میلیون تومان<br>🔴 لوکس: ۲ - ۵ میلیون تومان<br><br>⚠️ قیمت آخر هفته و تعطیلات بیشتر است.';
+            }
+            
+            if (q.includes('لغو') || q.includes('رزرو')) {
+                return '❌ <b>قوانین لغو رزرو:</b><br><br>• لغو ۴۸ ساعت قبل: ۱۰۰٪ بازپرداخت<br>• لغو ۲۴ ساعت قبل: ۵۰٪ بازپرداخت<br>• لغو کمتر از ۲۴ ساعت: بدون بازپرداخت<br><br>برای لغو به بخش "رزروهای من" در پروفایل بروید.';
+            }
+            
+            if (q.includes('سلام') || q.includes('خوبی') || q.includes('هی')) {
+                return '👋 سلام! خوبم، ممنون که پرسیدی.<br><br>چطور می‌توانم به تو کمک کنم؟<br><br>👇 می‌توانی از دکمه‌های پایین صفحه استفاده کنی.';
+            }
+            
+            return '🙏 <b>راهنمای اینجا:</b><br><br>روی دکمه‌های زیر کلیک کن:<br><br>🏠 <b>چطوری ویلا اجاره کنم؟</b><br>📍 <b>بهترین شهر شمال کجاست؟</b><br>💰 <b>قیمت ویلاها چقدر است؟</b><br>❌ <b>قوانین لغو رزرو چیست؟</b><br><br>یک گزینه رو انتخاب کن تا راهنمایی شوی.';
+        }
     </script>
+    @endif
+    
 </body>
 </html>

@@ -1,619 +1,497 @@
-<footer class="footer ocean-footer" role="contentinfo">
-    {{-- Large Whale Background --}}
-    <div class="whale-background">
-        <div class="whale-container">
-            <img src="/storage/static/blue-whale.png" 
-                 alt="نهنگ آبی - نماد عمق و آرامش {{ getConfigs('website-title') }}"
-                 class="whale-image"
-                 loading="lazy"
-                 width="300"
-                 height="225">
-        </div>
-    </div>
-    
-    {{-- Footer Content --}}
-    <div class="footer-content">
-        {{-- Brand Column --}}
-        <div class="footer-col brand-col">
-            <h3 itemprop="name">{{ getConfigs("website-title") }}</h3>
-            <p itemprop="description">{{ getConfigs("website-description") }}</p>
-            <div class="social-icons">
-                <a href="{{ getConfigs("instagramLink") }}" 
-                   class="social-icon" 
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   aria-label="صفحه اینستاگرام {{ getConfigs('website-title') }}">
-                    <i class="fa fa-instagram"></i>
-                </a>
-                <a href="{{ getConfigs("telegramLink") }}" 
-                   class="social-icon" 
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   aria-label="کانال تلگرام {{ getConfigs('website-title') }}">
-                    <i class="fa fa-telegram"></i>
-                </a>
-                <a href="{{ getConfigs("whatsappLink") }}" 
-                   class="social-icon" 
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   aria-label="واتساپ {{ getConfigs('website-title') }}">
-                    <i class="fa fa-whatsapp"></i>
-                </a>
+<footer class="footer-art">
+    {{-- نوارهای رنگی - المان اصلی و متفاوت --}}
+    <div class="art-bars">
+        {{-- نوار ۱: برند و لوگو + توضیحات کامل --}}
+        <div class="art-bar bar-brand">
+            <div class="bar-content">
+                <div class="brand-full">
+                    <div class="brand-mini">
+                        <i class="fa fa-compass"></i>
+                        <span>{{ getConfigs("website-title") }}</span>
+                    </div>
+                    <p class="brand-desc-full">{{ getConfigs("website-description") }}</p>
+                </div>
             </div>
         </div>
 
-        {{-- Quick Links --}}
-        <div class="footer-col">
-            <h4>دسترسی سریع</h4>
-            <ul class="footer-links-list" role="list">
-                <li role="listitem">
-                    <a href="{{ url('/') }}" itemprop="url">صفحه اصلی</a>
-                </li>
-                <li role="listitem">
-                    <a href="{{ url('/contact') }}" itemprop="url">تماس با ما</a>
-                </li>
-            </ul>
+        {{-- نوار ۲: دسترسی سریع --}}
+        <div class="art-bar bar-links">
+            <div class="bar-content">
+                <div class="bar-header">
+                    <i class="fa fa-bolt"></i>
+                    <span>دسترسی سریع</span>
+                </div>
+                <div class="bar-links-group">
+                    <a href="{{ url('/') }}">صفحه اصلی</a>
+                    <a href="{{ url('/contact') }}">تماس با ما</a>
+                </div>
+            </div>
         </div>
 
-        {{-- Pages Links --}}
-        <div class="footer-col">
-            <h4>ارتباط و همکاری</h4>
-            <ul class="footer-links-list" role="list">
-                @foreach(\App\Models\Page::where("status",true)->get() as $item)
-                <li role="listitem">
-                    <a href="{{ url('/p/'.$item->url_text) }}" 
-                       itemprop="url"
-                       title="{{ $item->title }}">
-                        {{ $item->title }}
+        {{-- نوار ۳: صفحات و اطلاعات --}}
+        <div class="art-bar bar-pages">
+            <div class="bar-content">
+                <div class="bar-header">
+                    <i class="fa fa-file-text-o"></i>
+                    <span>اطلاعات</span>
+                </div>
+                <div class="bar-links-group">
+                    @foreach(\App\Models\Page::where("status",true)->get() as $item)
+                    <a href="{{ url('/p/'.$item->url_text) }}">{{ $item->title }}</a>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        {{-- نوار ۴: شبکه‌های اجتماعی --}}
+        <div class="art-bar bar-social">
+            <div class="bar-content">
+                <div class="bar-header">
+                    <i class="fa fa-share-alt"></i>
+                    <span>ما را دنبال کنید</span>
+                </div>
+                <div class="social-mini-group">
+                    <a href="{{ getConfigs("instagramLink") }}" class="social-mini-icon" target="_blank">
+                        <i class="fa fa-instagram"></i>
+                        <span>اینستاگرام</span>
                     </a>
-                </li>
-                @endforeach
-            </ul>
-        </div>
-
-        {{-- Contact Info --}}
-        <div class="footer-col">
-            <h4>تماس با ما</h4>
-            <div class="contact-info" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
-                <div class="contact-item">
-                    <i class="fa fa-phone" aria-hidden="true"></i>
-                    <span itemprop="telephone">{{ getConfigs("phone1") }}</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fa fa-envelope" aria-hidden="true"></i>
-                    <span itemprop="email">{{ getConfigs("email") }}</span>
-                </div>
-                <div class="contact-item">
-                    <i class="fa fa-map-marker" aria-hidden="true"></i>
-                    <span itemprop="streetAddress">{{ getConfigs("address") }}</span>
+                    <a href="{{ getConfigs("telegramLink") }}" class="social-mini-icon" target="_blank">
+                        <i class="fa fa-telegram"></i>
+                        <span>تلگرام</span>
+                    </a>
+                    <a href="{{ getConfigs("whatsappLink") }}" class="social-mini-icon" target="_blank">
+                        <i class="fa fa-whatsapp"></i>
+                        <span>واتساپ</span>
+                    </a>
                 </div>
             </div>
-            
-            {{-- Trust Badges --}}
-            <div class="trust-badges">
-                <img src="/storage/static/enamad.png" 
-                     alt="نماد اعتماد الکترونیکی" 
-                     loading="lazy"
-                     width="60" 
-                     height="60">
-                <img src="/storage/static/iwfm.png" 
-                     alt="جشنواره وب و موبایل ایران" 
-                     loading="lazy"
-                     width="60" 
-                     height="60">
-                <img src="/storage/static/sole.png" 
-                     alt="کسب‌وکار تک‌نفره" 
-                     loading="lazy"
-                     width="60" 
-                     height="60">
+        </div>
+
+        {{-- نوار ۵: تماس با ما (آدرس کامل) --}}
+        <div class="art-bar bar-contact">
+            <div class="bar-content">
+                <div class="bar-header">
+                    <i class="fa fa-headphones"></i>
+                    <span>پشتیبانی</span>
+                </div>
+                <div class="contact-full-group">
+                    <div class="contact-full-item">
+                        <i class="fa fa-phone"></i>
+                        <div>
+                            <span>تلفن پشتیبانی</span>
+                            <strong>{{ getConfigs("phone1") }}</strong>
+                        </div>
+                    </div>
+                    <div class="contact-full-item">
+                        <i class="fa fa-envelope"></i>
+                        <div>
+                            <span>ایمیل</span>
+                            <strong>{{ getConfigs("email") }}</strong>
+                        </div>
+                    </div>
+                    <div class="contact-full-item">
+                        <i class="fa fa-map-marker"></i>
+                        <div>
+                            <span>آدرس</span>
+                            <strong>{{ getConfigs("address") }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- نوار ۶: نمادهای اعتماد --}}
+        <div class="art-bar bar-trust">
+            <div class="bar-content">
+                <div class="bar-header">
+                    <i class="fa fa-shield"></i>
+                    <span>نمادهای اعتماد</span>
+                </div>
+                <div class="trust-full-group">
+                    <img src="/storage/static/enamad.png" alt="اینماد" loading="lazy">
+                    <img src="/storage/static/iwfm.png" alt="آی دبلیو اف ام" loading="lazy">
+                    <img src="/storage/static/sole.png" alt="سول" loading="lazy">
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- Footer Bottom --}}
-    <div class="footer-bottom">
-        <div class="copyright">
-            © {{ jalaliDate("Y",time()) }} تمام حقوق برای 
-            <strong itemprop="name">{{ getConfigs("website-title") }}</strong> 
-            محفوظ است
-        </div>
+    {{-- کپی‌رایت مینیمال --}}
+    <div class="art-copyright">
+        <span>© {{ jalaliDate("Y",time()) }} {{ getConfigs("website-title") }}</span>
+        <span class="copyright-sign">✦</span>
+        <span>طراحی شده در شمال ایران</span>
     </div>
 </footer>
 
 <style>
-    /* Base Styles - با ارتفاع بیشتر برای نهنگ بزرگ */
-    .ocean-footer {
-        background: linear-gradient(to bottom, #001a35, #000b1a);
-        color: #ecf0f1;
-        padding: 60px 0 40px; /* Padding پایین بیشتر */
-        margin-top: 50px;
+    /* ============================================
+       فوتر هنری نهایی - بدون نارنجی اضافی
+       متن‌ها راست‌چین
+    ============================================ */
+    
+    .footer-art {
+        background: #0A2B4E;
+        margin-top: 60px;
+        position: relative;
+    }
+    
+    /* نوارهای اصلی */
+    .art-bars {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .art-bar {
+        padding: 24px 40px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        transition: all 0.35s ease;
         position: relative;
         overflow: hidden;
-        border-top: 3px solid var(--primary-color);
-        min-height: 500px; /* ارتفاع بیشتر */
+        text-align: right;
     }
     
-    /* Whale Background - بزرگتر */
-    .whale-background {
+    /* رنگ‌بندی حرفه‌ای هر نوار - فقط آبی‌های مختلف */
+    .bar-brand { background: linear-gradient(135deg, #1A4A6E 0%, #0F3550 100%); }
+    .bar-links { background: linear-gradient(135deg, #1E5580 0%, #134065 100%); }
+    .bar-pages { background: linear-gradient(135deg, #226092 0%, #174C78 100%); }
+    .bar-social { background: linear-gradient(135deg, #266BA4 0%, #1A558A 100%); }
+    .bar-contact { background: linear-gradient(135deg, #2A76B6 0%, #1D609C 100%); }
+    .bar-trust { background: linear-gradient(135deg, #2E81C8 0%, #206AAE 100%); }
+    
+    /* افکت حرکت نور روی نوارها */
+    .art-bar::before {
+        content: '';
         position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 300px; /* ارتفاع بیشتر */
-        z-index: 1;
-        pointer-events: none;
-        opacity: 0.9;
-    }
-    
-    /* Whale Container - حداکثر سایز */
-    .whale-container {
-        position: absolute;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%) scaleX(-1);
-        width: 300px; /* سایز ماکزیمم */
-        height: 225px;
-        z-index: 2;
-        animation: whaleFloatLarge 35s infinite ease-in-out;
-        filter: drop-shadow(0 5px 15px rgba(0, 150, 255, 0.5));
-    }
-    
-    .whale-image {
+        top: 0;
+        left: -100%;
         width: 100%;
         height: 100%;
-        object-fit: contain;
-        opacity: 0.9;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+        transition: left 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        pointer-events: none;
     }
     
-    /* Animation برای نهنگ بزرگ */
-    @keyframes whaleFloatLarge {
-        0%, 100% {
-            transform: translateX(-50%) translateY(0px) scaleX(-1);
-        }
-        25% {
-            transform: translateX(calc(-50% - 40px)) translateY(-15px) scaleX(-1);
-        }
-        50% {
-            transform: translateX(-50%) translateY(8px) scaleX(-1);
-        }
-        75% {
-            transform: translateX(calc(-50% + 40px)) translateY(-12px) scaleX(-1);
-        }
+    .art-bar:hover::before {
+        left: 100%;
     }
     
-    /* Footer Content - با margin-top بیشتر */
-    .footer-content {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 15px;
-        position: relative;
-        z-index: 3;
-        margin-top: 40px; /* فاصله از بالای فوتر */
+    .art-bar:hover {
+        padding-right: 55px;
+        background: #1A4A6E;
     }
     
-    .footer-col {
-        flex: 1;
-        min-width: 250px;
-        margin-bottom: 30px;
-        padding: 0 15px;
-    }
-    
-    .footer-col h3 {
-        color: #4dc3ff;
-        margin-bottom: 15px;
-        font-size: 18px;
-    }
-    
-    .footer-col h4 {
+    .art-bar:hover .bar-header i,
+    .art-bar:hover .bar-header span,
+    .art-bar:hover .brand-mini span,
+    .art-bar:hover .brand-desc-full,
+    .art-bar:hover .bar-links-group a,
+    .art-bar:hover .social-mini-icon,
+    .art-bar:hover .contact-full-item,
+    .art-bar:hover .contact-full-item i,
+    .art-bar:hover .contact-full-item span,
+    .art-bar:hover .contact-full-item strong {
         color: #66ccff;
-        margin-bottom: 15px;
-        font-size: 16px;
     }
     
-    /* Social Icons */
-    .social-icons {
+    .art-bar:hover .trust-full-group img {
+        background: white;
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    /* محتوای داخل نوار */
+    .bar-content {
         display: flex;
-        gap: 12px;
-        margin-top: 15px;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
     }
     
-    .social-icon {
-        color: #88d3ff;
-        font-size: 16px;
-        transition: all 0.3s;
-        background: rgba(0, 100, 255, 0.15);
-        padding: 8px;
-        border-radius: 50%;
-        width: 36px;
-        height: 36px;
+    /* برند با توضیحات کامل */
+    .brand-full {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .brand-mini {
         display: flex;
         align-items: center;
-        justify-content: center;
-        text-decoration: none;
+        gap: 12px;
     }
     
-    .social-icon:hover {
+    .brand-mini i {
+        font-size: 28px;
+        color: #66ccff;
+    }
+    
+    .brand-mini span {
+        font-size: 20px;
+        font-weight: 800;
         color: white;
-        background: rgba(0, 100, 255, 0.3);
-        transform: translateY(-2px);
     }
     
-    /* Links */
-    .footer-links-list {
-        list-style: none;
-        padding: 0;
+    .brand-desc-full {
+        font-size: 13px;
+        text-align: right;
+        line-height: 1.6;
+        color: #B0D4F0;
+        margin: 0;
+        max-width: 90%;
     }
     
-    .footer-links-list li {
-        margin-bottom: 8px;
+    /* هدر هر نوار */
+    .bar-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     
-    .footer-links-list a {
-        color: #a3d9ff;
-        text-decoration: none;
-        transition: all 0.3s;
-        display: inline-block;
-        padding: 3px 0;
-        font-size: 14px;
+    .bar-header i {
+        font-size: 18px;
+        color: #66ccff;
     }
     
-    .footer-links-list a:hover {
+    .bar-header span {
+        font-size: 15px;
+        font-weight: 700;
         color: white;
+        letter-spacing: 0.5px;
+    }
+    
+    /* گروه لینک‌ها */
+    .bar-links-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+    
+    .bar-links-group a {
+        color: #B0D4F0;
+        text-decoration: none;
+        font-size: 13px;
+        transition: all 0.2s;
+        position: relative;
+    }
+    
+    .bar-links-group a::after {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        right: 0;
+        width: 0;
+        height: 1px;
+        background: #66ccff;
+        transition: width 0.3s;
+    }
+    
+    .bar-links-group a:hover::after {
+        width: 100%;
+        right: auto;
+        left: 0;
+    }
+    
+    .bar-links-group a:hover {
+        color: #66ccff;
         transform: translateX(3px);
     }
     
-    /* Contact Info */
-    .contact-info {
-        margin-bottom: 20px;
+    /* شبکه اجتماعی */
+    .social-mini-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
     }
     
-    .contact-item {
+    .social-mini-icon {
         display: flex;
         align-items: center;
-        margin-bottom: 8px;
-    }
-    
-    .contact-item i {
-        margin-left: 8px;
-        color: #4dc3ff;
-        font-size: 14px;
-        min-width: 16px;
-        text-align: center;
-    }
-    
-    .contact-item span {
-        color: #b3e0ff;
-        font-size: 13px;
-    }
-    
-    /* Trust Badges */
-    .trust-badges {
-        display: flex;
         gap: 8px;
-        flex-wrap: wrap;
-        margin-top: 15px;
-    }
-    
-    .trust-badges img {
-        width: 55px;
-        height: 55px;
-        object-fit: contain;
-        border-radius: 5px;
-        background: rgba(255, 255, 255, 0.08);
-        padding: 4px;
-        border: 1px solid rgba(77, 195, 255, 0.2);
-    }
-    
-    /* Footer Bottom */
-    .footer-bottom {
-        text-align: center;
-        padding-top: 40px; /* بیشتر */
-        margin-top: 40px; /* بیشتر */
-        border-top: 1px solid rgba(77, 195, 255, 0.2);
-        position: relative;
-        z-index: 3;
-    }
-    
-    .copyright {
-        color: #88d3ff;
+        color: #B0D4F0;
+        text-decoration: none;
         font-size: 13px;
+        transition: all 0.2s;
+        padding: 5px 10px;
+        border-radius: 40px;
+        background: rgba(255,255,255,0.03);
     }
     
-    /* ========== RESPONSIVE DESIGN ========== */
-    /* سایز نهنگ ثابت می‌ماند، فقط موقعیت آن تغییر می‌کند */
-    
-    /* Desktop Large (1400px و بالاتر) */
-    @media (min-width: 1400px) {
-        .whale-container {
-            width: 350px; /* حتی بزرگتر */
-            height: 263px;
-            bottom: 40px;
-        }
-        
-        .whale-background {
-            height: 350px;
-        }
-        
-        .ocean-footer {
-            min-height: 600px;
-        }
+    .social-mini-icon i {
+        font-size: 16px;
     }
     
-    /* Desktop (1200px - 1399px) */
-    @media (min-width: 1200px) and (max-width: 1399px) {
-        .whale-container {
-            width: 320px;
-            height: 240px;
-            bottom: 35px;
-        }
-        
-        .whale-background {
-            height: 320px;
-        }
-        
-        .ocean-footer {
-            min-height: 550px;
-        }
+    .social-mini-icon:hover {
+        color: #66ccff;
+        background: rgba(255,255,255,0.08);
+        transform: translateY(-2px);
     }
     
-    /* Desktop Medium (992px - 1199px) */
-    @media (min-width: 992px) and (max-width: 1199px) {
-        .whale-container {
-            width: 300px;
-            height: 225px;
-            bottom: 30px;
-        }
-        
-        .whale-background {
-            height: 300px;
-        }
-        
-        .ocean-footer {
-            min-height: 500px;
-        }
+    /* اطلاعات تماس کامل */
+    .contact-full-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
     }
     
-    /* Tablet Landscape (768px - 991px) */
-    @media (min-width: 768px) and (max-width: 991px) {
-        .whale-container {
-            width: 300px; /* همان سایز بزرگ */
-            height: 225px;
-            bottom: 25px;
-            left: 10%; /* کمی به چپ */
-            transform: translateX(0%) scaleX(-1); /* بدون ترنسلیت مرکزی */
-        }
-        
-        .whale-background {
-            height: 280px;
-        }
-        
-        .ocean-footer {
-            min-height: 480px;
-            padding: 50px 0 30px;
-        }
-        
-        .footer-col {
-            flex: 0 0 50%;
-            margin-bottom: 30px;
-        }
-        
-        .footer-content {
-            margin-top: 30px;
-        }
+    .contact-full-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: #B0D4F0;
     }
     
-    /* Mobile Landscape (576px - 767px) */
-    @media (min-width: 576px) and (max-width: 767px) {
-        .whale-container {
-            width: 280px; /* کمی کوچکتر ولی هنوز بزرگ */
-            height: 210px;
-            bottom: 20px;
-            left: 5%;
-            transform: translateX(0%) scaleX(-1);
+    .contact-full-item i {
+        width: 32px;
+        height: 32px;
+        background: rgba(102, 204, 255, 0.12);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: #66ccff;
+    }
+    
+    .contact-full-item div {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .contact-full-item span {
+        font-size: 10px;
+        color: #7FA8C9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .contact-full-item strong {
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+    }
+    
+    /* نمادهای اعتماد */
+    .trust-full-group {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .trust-full-group img {
+        width: 48px;
+        height: 48px;
+        background: white;
+        border-radius: 12px;
+        padding: 6px;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+    
+    /* کپی‌رایت مینیمال */
+    .art-copyright {
+        text-align: center;
+        padding: 16px;
+        background: #051a2f;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .art-copyright span {
+        font-size: 11px;
+        color: rgba(255,255,255,0.35);
+        letter-spacing: 0.5px;
+    }
+    
+    .copyright-sign {
+        font-size: 10px;
+        color: #66ccff;
+    }
+    
+    /* ریسپانسیو موبایل */
+    @media (max-width: 992px) {
+        .art-bar {
+            padding: 20px 24px;
         }
         
-        .whale-background {
-            height: 250px;
+        .bar-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
         }
         
-        .ocean-footer {
-            min-height: 450px;
-            padding: 40px 0 25px;
-        }
-        
-        .footer-col {
-            flex: 0 0 50%;
-            padding: 0 10px;
-            margin-bottom: 25px;
-        }
-        
-        .footer-content {
-            padding: 0 10px;
-            margin-top: 20px;
-        }
-        
-        .social-icons {
-            gap: 10px;
+        .brand-desc-full {
+            max-width: 100%;
         }
     }
     
-    /* Mobile Portrait (375px - 575px) */
-    @media (min-width: 375px) and (max-width: 575px) {
-        .whale-container {
-            width: 250px; /* بزرگ ولی متناسب با موبایل */
-            height: 188px;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%) scaleX(-1); /* باز هم مرکزی */
+    @media (max-width: 768px) {
+        .art-bar {
+            padding: 18px 20px;
         }
         
-        .whale-background {
-            height: 220px;
+        .bar-links-group {
+            gap: 15px;
+            flex-wrap: wrap;
         }
         
-        .ocean-footer {
-            min-height: 420px;
-            padding: 40px 0 20px;
+        .social-mini-group {
+            gap: 12px;
+            flex-wrap: wrap;
         }
         
-        .footer-content {
-            padding: 0 10px;
-            margin-top: 15px;
+        .contact-full-group {
+            flex-direction: column;
+            gap: 12px;
         }
         
-        .footer-col {
-            flex: 0 0 100%;
-            padding: 0;
-            margin-bottom: 25px;
+        .trust-full-group {
+            flex-wrap: wrap;
         }
         
-        .footer-col h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
+        .art-bar:hover {
+            padding-right: 20px;
         }
         
-        .footer-col h4 {
-            font-size: 15px;
-            margin-bottom: 12px;
+        .brand-mini span {
+            font-size: 18px;
         }
         
-        .social-icons {
-            justify-content: center;
-            gap: 10px;
-        }
-        
-        .social-icon {
-            width: 34px;
-            height: 34px;
-            font-size: 15px;
-            padding: 7px;
-        }
-    }
-    
-    /* Mobile Small (320px - 374px) */
-    @media (min-width: 320px) and (max-width: 374px) {
-        .whale-container {
-            width: 220px; /* بزرگ ولی متناسب */
-            height: 165px;
-            bottom: 12px;
-            left: 50%;
-            transform: translateX(-50%) scaleX(-1);
-        }
-        
-        .whale-background {
-            height: 200px;
-        }
-        
-        .ocean-footer {
-            min-height: 400px;
-            padding: 35px 0 18px;
-        }
-        
-        .trust-badges img {
-            width: 50px;
-            height: 50px;
-        }
-        
-        .copyright {
+        .brand-desc-full {
             font-size: 12px;
-            padding: 0 10px;
         }
     }
     
-    /* Very Small Mobile (max-width: 319px) */
-    @media (max-width: 319px) {
-        .whale-container {
-            width: 200px; /* حداقل سایز بزرگ */
-            height: 150px;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%) scaleX(-1);
+    @media (max-width: 480px) {
+        .bar-links-group {
+            flex-direction: column;
+            gap: 8px;
         }
         
-        .whale-background {
-            height: 180px;
+        .social-mini-group {
+            flex-direction: column;
+            gap: 8px;
         }
         
-        .ocean-footer {
-            min-height: 380px;
-            padding: 30px 0 15px;
-        }
-        
-        .trust-badges img {
-            width: 45px;
-            height: 45px;
-        }
-    }
-    
-    /* Print Styles */
-    @media print {
-        .whale-background,
-        .social-icons {
-            display: none;
-        }
-        
-        .ocean-footer {
-            background: white !important;
-            color: black !important;
-            border-top: 1px solid #ccc;
-            min-height: auto !important;
-            padding: 30px 0 20px !important;
+        .social-mini-icon {
+            width: fit-content;
         }
     }
 </style>
 
 <script>
-// JavaScript برای نهنگ بزرگ
-document.addEventListener('DOMContentLoaded', function() {
-    const whale = document.querySelector('.whale-container');
-    
-    // تنظیم انیمیشن بر اساس سایز صفحه
-    if (whale) {
-        // سرعت انیمیشن بر اساس عرض صفحه
-        const screenWidth = window.innerWidth;
-        let animationDuration = 35; // ثانیه
-        
-        if (screenWidth <= 767) {
-            animationDuration = 25; // سریعتر در موبایل
-        }
-        
-        whale.style.animationDuration = animationDuration + 's';
-        
-        // بهینه‌سازی عملکرد
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                whale.style.animationPlayState = 'paused';
-            } else {
-                whale.style.animationPlayState = 'running';
+    // قابلیت کلیک روی نوارها
+    document.querySelectorAll('.art-bar').forEach(bar => {
+        bar.addEventListener('click', function(e) {
+            if (!e.target.closest('a') && !e.target.closest('.trust-full-group') && !e.target.closest('.contact-full-item')) {
+                window.location.href = '{{ url('/') }}';
             }
         });
-        
-        // ریسایز کردن موقعیت نهنگ
-        window.addEventListener('resize', function() {
-            const currentWidth = window.innerWidth;
-            let newDuration = 35;
-            
-            if (currentWidth <= 767) {
-                newDuration = 25;
-            }
-            
-            whale.style.animationDuration = newDuration + 's';
-        });
-    }
-    
-    // اضافه کردن افکت hover اختیاری
-    const footer = document.querySelector('.ocean-footer');
-    if (footer && whale) {
-        footer.addEventListener('mouseenter', function() {
-            whale.style.filter = 'drop-shadow(0 8px 20px rgba(0, 150, 255, 0.7))';
-        });
-        
-        footer.addEventListener('mouseleave', function() {
-            whale.style.filter = 'drop-shadow(0 5px 15px rgba(0, 150, 255, 0.5))';
-        });
-    }
-});
+    });
 </script>

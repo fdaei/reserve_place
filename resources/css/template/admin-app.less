@@ -3157,3 +3157,66 @@ body.admin-body {
         max-width: 100%;
     }
 }
+
+/* Admin layout emergency fix */
+html[dir="rtl"] body.admin-body {
+    direction: rtl;
+    margin: 0;
+    min-height: 100vh;
+    background: #f5f7fb;
+}
+
+body.admin-body .admin-shell {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 100vh;
+}
+
+body.admin-body .sidebar,
+body.admin-body .admin-sidebar {
+    flex: 0 0 280px;
+    width: 280px;
+    max-width: 280px;
+    min-height: 100vh;
+}
+
+body.admin-body .main-content {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 24px;
+}
+
+body.admin-body .admin-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+body.admin-body .admin-topbar,
+body.admin-body .top-bar {
+    width: 100%;
+}
+
+@media (max-width: 992px) {
+    body.admin-body .sidebar,
+    body.admin-body .admin-sidebar {
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 1000;
+        transform: translateX(100%);
+    }
+
+    body.admin-body .admin-sidebar-toggle:checked ~ .sidebar,
+    body.admin-body .admin-sidebar-toggle:checked ~ .admin-sidebar {
+        transform: translateX(0);
+    }
+
+    body.admin-body .main-content {
+        width: 100%;
+        padding: 16px;
+    }
+}
